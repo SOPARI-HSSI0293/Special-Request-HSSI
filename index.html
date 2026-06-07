@@ -378,42 +378,49 @@
         }
 
         // PENGIRIMAN DATA FORM MENGGUNAKAN JQUERY POST STANDAR (Bypass CORS)
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            let selectedSubjects = [];
-            $('input[name="subjectIssue"]:checked').each(function() { selectedSubjects.push($(this).val()); });
+function handleFormSubmit(e) {
+    e.preventDefault();
+    let selectedSubjects = [];
+    $('input[name="subjectIssue"]:checked').each(function() { selectedSubjects.push($(this).val()); });
 
-            if(selectedSubjects.length === 0) {
-                Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu pilihan Subject Issue.', icon: 'error' });
-                return;
+    if(selectedSubjects.length === 0) {
+        Swal.fire('Gagal!', 'Pilih minimal satu subject.', 'error');
+        return;
+    }
+
+    const payload = {
+        action: "create",
+        date: $('#dateInput').val(),
+        pic: $('#picInput').val(),
+        department: $('#deptInput').val(),
+        customer: $('#customerInput').val(),
+        po_number: $('#poInput').val(),
+        subject: selectedSubjects.join(", "),
+        description: $('#detailInput').val()
+    };
+
+    Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    $.ajax({
+        url: API_URL,
+        type: 'POST',
+        data: payload, // jQuery akan otomatis mengubah ini ke format form-urlencoded
+        dataType: 'json',
+        success: function(res) {
+            // Cek jika status sukses
+            if(res && res.status === "success") {
+                Swal.fire('Berhasil!', 'ID: ' + res.id, 'success');
+                clearForm(); fetchBackendData(); switchTab('dataTab');
+            } else {
+                Swal.fire('Backend Error', res.message || 'Respons tidak dikenal', 'error');
             }
-
-            const payload = {
-                action: "create",
-                date: document.getElementById('dateInput').value,
-                pic: document.getElementById('picInput').value,
-                department: document.getElementById('deptInput').value,
-                customer: document.getElementById('customerInput').value,
-                po_number: document.getElementById('poInput').value,
-                subject: selectedSubjects.join(", "),
-                description: document.getElementById('detailInput').value
-            };
-
-            Swal.fire({ title: 'Menyimpan...', text: 'Mengirim baris ke cloud database.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            $.post(API_URL, payload, function(res) {
-                if(res.status === "success") {
-                    Swal.fire({ title: 'Berhasil!', text: 'ID Terdaftar: ' + res.id, icon: 'success' });
-                    clearForm(); 
-                    fetchBackendData(); 
-                    switchTab('dataTab'); // Kembali ke dashboard setelah simpan sukses
-                } else {
-                    Swal.fire({ title: 'Gagal Menyimpan!', text: res.message, icon: 'error' });
-                }
-            }, "json").fail(function() {
-                Swal.fire({ title: 'Error Koneksi!', text: 'Gagal menghubungi server GAS. Pastikan API_URL benar.', icon: 'error' });
-            });
+        },
+        error: function(xhr, status, error) {
+            console.log("Raw Response:", xhr.responseText);
+            Swal.fire('Gagal!', 'Server merespons: ' + error + '. Cek Console Browser (F12) untuk detail.', 'error');
         }
+    });
+}
 
         function clearForm() { document.getElementById('specialRequestForm').reset(); document.getElementById('dateInput').valueAsDate = new Date(); }
 
