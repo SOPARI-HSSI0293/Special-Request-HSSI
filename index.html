@@ -69,7 +69,7 @@
             </a>
         </nav>
         <div class="p-4 text-[10px] text-slate-400 text-center border-t border-slate-100 sidebar-text">
-            Version 2.0 &copy; 2026 Internal Automation
+            &copy; 2026 Internal Automation
         </div>
     </aside>
 
@@ -93,7 +93,7 @@
                         <input type="date" id="dashStart" class="px-2 py-1 bg-transparent text-sm font-medium text-[#0a4f4f] border-none outline-none">
                         <span class="text-[#187a7a]">-</span>
                         <input type="date" id="dashEnd" class="px-2 py-1 bg-transparent text-sm font-medium text-[#0a4f4f] border-none outline-none">
-                        <button onclick="refreshData()" class="bg-[#0a4f4f] text-white px-5 py-1.5 rounded-md hover:bg-[#073d3d] text-sm font-bold shadow-sm">Filter</button>
+                        <button onclick="calculateMetrics()" class="bg-[#0a4f4f] text-white px-5 py-1.5 rounded-md hover:bg-[#073d3d] text-sm font-bold shadow-sm">Filter</button>
                     </div>
                 </div>
 
@@ -217,7 +217,7 @@
                         <input type="date" id="analyticStart" class="px-2 py-1.5 bg-transparent text-sm font-medium border-none outline-none">
                         <span class="text-slate-400 font-bold">-</span>
                         <input type="date" id="analyticEnd" class="px-2 py-1.5 bg-transparent text-sm font-medium border-none outline-none">
-                        <button onclick="refreshData()" class="bg-emerald-600 text-white px-6 py-1.5 rounded-md text-sm font-bold shadow-sm">Update Grafik</button>
+                        <button onclick="calculateMetrics()" class="bg-emerald-600 text-white px-6 py-1.5 rounded-md text-sm font-bold shadow-sm">Update Grafik</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -250,7 +250,7 @@
     </main>
 
     <script>
-        // MASUKKAN API URL WEB APP APPS SCRIPT ANDA DI SINI
+        // TEMPELKAN URL DEPLOYMENT WEB APP (ANYONE) DARI GAS ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycby0AJMewPxZOriX_sYX-wFhgjEKOEHJbHtjxmYCcQH3DDsiXXx2CTyYBBuZuZHj0WvBAQ/exec"; 
         
         let localDataStore = [];
@@ -258,7 +258,6 @@
         let chartYearlyObj, chartCustomerObj, chartSubjectObj;
 
         $(document).ready(function() {
-            // Set running month dates
             const date = new Date();
             const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
             const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
@@ -272,7 +271,6 @@
             fetchBackendData();
         });
 
-        // Current time clock
         setInterval(() => { document.getElementById('currentTime').innerText = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }); }, 1000);
 
         function toggleSidebar() { $('#sidebar').toggleClass('w-64 w-20'); $('.sidebar-text').toggleClass('hidden'); }
@@ -285,13 +283,15 @@
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
+        // AMBIL DATA DARI BACKEND MENGGUNAKAN GET METHOD
         function fetchBackendData() {
-            if(API_URL.includes("MOCK_API_KEY")) {
+            if(API_URL.includes("YOUR_DEPLOYED_ID")) {
+                // Fail-safe Mock fallback jika URL belum diisi kustom
                 localDataStore = [
                     { "ID Request": "SR-260601-01", "DATE": "2026-06-01", "CUSTOMER": "PT. Astra", "PROCESS_ORDER_NO": "PO-100", "SUBJECT": "Material Substitution, Sample", "DEPARTMENT": "Sales", "PIC": "Dewi K", "STATUS": "Open", "REMARKS": "-" },
                     { "ID Request": "SR-260603-01", "DATE": "2026-06-03", "CUSTOMER": "PT. Toyota Motor", "PROCESS_ORDER_NO": "PO-105", "SUBJECT": "Urgent Proses", "DEPARTMENT": "Sales", "PIC": "Rian H", "STATUS": "Approved", "REMARKS": "Forwarded to Line 2" },
                     { "ID Request": "SR-260605-01", "DATE": "2026-06-05", "CUSTOMER": "CV. Bahagia", "PROCESS_ORDER_NO": "PO-110", "SUBJECT": "Out of Standart", "DEPARTMENT": "Sales", "PIC": "Dewi K", "STATUS": "Rejected", "REMARKS": "Spec Not Match" },
-                    { "ID Request": "SR-260607-01", "DATE": "2026-06-07", "CUSTOMER": "PT. Hanwa Indonesia", "PROCESS_ORDER_NO": "PO-200", "SUBJECT": "Trial Machine, Trial Proses", "DEPARTMENT": "Sales", "PIC": "Budi T", "STATUS": "Completed", "REMARKS": "Trial sukses hasil OK" }
+                    { "ID Request": "SR-260607-01", "DATE": "2026-06-07", "CUSTOMER": "PT. Hanwa Indonesia", "PROCESS_ORDER_NO": "PO-200", "SUBJECT": "Trial Machine", "DEPARTMENT": "Sales", "PIC": "Budi T", "STATUS": "Completed", "REMARKS": "Trial sukses hasil OK" }
                 ];
                 renderTables();
                 calculateMetrics();
@@ -365,8 +365,8 @@
         function renderActionButtons(id) {
             return `
                 <div class="flex justify-center space-x-3">
-                    <button onclick="triggerPrintEngine('${id}')" title="Print Otomatis via GAS" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>
-                    <button onclick="openStatusUpdateModal('${id}')" title="Update Status Alur (PPC/QC/Prod)" class="text-slate-400 hover:text-purple-600 text-base"><i class="fa-solid fa-stamp"></i></button>
+                    <button onclick="triggerPrintEngine('${id}')" title="Print Otomatis" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>
+                    <button onclick="openStatusUpdateModal('${id}')" title="Update Status Kontrol" class="text-slate-400 hover:text-purple-600 text-base"><i class="fa-solid fa-stamp"></i></button>
                 </div>`;
         }
 
@@ -384,18 +384,14 @@
             updateChartGraphics(filtered);
         }
 
-        function refreshData() {
-            fetchBackendData();
-            Swal.fire({ title: 'Data Diperbarui!', text: 'Metrik & grafik disesuaikan.', icon: 'success', timer: 1000, showConfirmButton: false });
-        }
-
+        // PENERAPAN NATIVE FETCH UNTUK MENGHINDARI PREFLIGHT CORS BLOCK GOOGLE WEB APP
         function handleFormSubmit(e) {
             e.preventDefault();
             let selectedSubjects = [];
             $('input[name="subjectIssue"]:checked').each(function() { selectedSubjects.push($(this).val()); });
 
             if(selectedSubjects.length === 0) {
-                Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu pilihan Subject Issue.', icon: 'error', confirmButtonColor: '#ef4444' });
+                Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu pilihan Subject Issue.', icon: 'error' });
                 return;
             }
 
@@ -410,38 +406,36 @@
                 description: document.getElementById('detailInput').value
             };
 
-            Swal.fire({ title: 'Menyimpan ke Database...', text: 'Mengirim baris menuju Google Sheets terpusat.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Menyimpan...', text: 'Mengirim baris ke cloud database.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            if(API_URL.includes("MOCK_API_KEY")) {
-                setTimeout(() => {
-                    Swal.fire({ title: 'Sukses Terpaku!', text: 'Simpan simulasi berhasil. ID Baru di-generate otomatis oleh backend GAS.', icon: 'success' });
-                    clearForm(); fetchBackendData(); switchTab('dataTab');
-                }, 1000);
-                return;
-            }
-
-            $.post(API_URL, JSON.stringify(payload), function(res) {
+            // Menggunakan Native Fetch dengan text/plain (Simple Request) untuk menembus proteksi CORS GAS
+            fetch(API_URL, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(res => {
                 if(res.status === "success") {
-                    Swal.fire({ title: 'Berhasil Disimpan!', text: 'Tercatat dengan ID unik: ' + res.id, icon: 'success', confirmButtonColor: '#10b981' });
+                    Swal.fire({ title: 'Berhasil!', text: 'ID Terdaftar: ' + res.id, icon: 'success' });
                     clearForm(); fetchBackendData(); switchTab('dataTab');
+                } else {
+                    Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' });
                 }
-            }, "json");
+            })
+            .catch(err => {
+                Swal.fire({ title: 'Error Koneksi!', text: 'Periksa kembali deployment URL Web App GAS Anda.', icon: 'error' });
+            });
         }
 
         function clearForm() { document.getElementById('specialRequestForm').reset(); document.getElementById('dateInput').valueAsDate = new Date(); }
 
         function triggerPrintEngine(id) {
-            Swal.fire({ title: 'Menghubungi Server...', text: 'GAS sedang menduplikasi Template_Cetak & menyusun berkas PDF.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
-            if(API_URL.includes("MOCK_API_KEY")) {
-                setTimeout(() => Swal.fire({ title: 'Simulasi Cetak!', text: 'Di sistem asli, perintah ini membuka link direct PDF render dari Spreadsheet.', icon: 'info' }), 1200);
-                return;
-            }
-
+            Swal.fire({ title: 'Memproses Berkas...', text: 'Mempersiapkan PDF siap cetak.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             $.get(API_URL + "?action=print&id=" + id, function(res) {
                 if(res.status === "success") {
                     Swal.close(); window.open(res.pdfUrl, '_blank');
-                } else { Swal.fire({ title: 'Gagal Cetak!', text: res.message, icon: 'error' }); }
+                } else { Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); }
             });
         }
 
@@ -449,34 +443,36 @@
             Swal.fire({
                 title: 'Stempel Status Konfirmasi',
                 html: `
-                    <p class="text-xs text-slate-500 mb-3">Update pergerakan dokumen fisik untuk ID: <b>${id}</b></p>
                     <select id="swalStatus" class="w-full p-2 border rounded-lg mb-3 bg-white">
-                        <option value="Approved">Approved & Diteruskan ke Produksi</option>
-                        <option value="Rejected">Rejected / Dikembalikan ke Sales</option>
+                        <option value="Approved">Approved & Teruskan ke Produksi</option>
+                        <option value="Rejected">Rejected / Kembalikan ke Sales</option>
                         <option value="Completed">Completed (Selesai Eksekusi Lapangan)</option>
                     </select>
-                    <input type="text" id="swalRemarks" class="w-full p-2 border rounded-lg" placeholder="Masukkan catatan hasil analisis/remarks produksi">
+                    <input type="text" id="swalRemarks" class="w-full p-2 border rounded-lg" placeholder="Masukkan catatan remarks analisa">
                 `,
                 showCancelButton: true, confirmButtonText: 'Update Status', confirmButtonColor: '#10b981',
                 preConfirm: () => ({ action: "updateStatus", id: id, status: document.getElementById('swalStatus').value, remarks: document.getElementById('swalRemarks').value })
             }).then((result) => {
                 if(result.isConfirmed) {
-                    Swal.fire({ title: 'Memproses konfirmasi...', didOpen: () => Swal.showLoading() });
-                    if(API_URL.includes("MOCK_API_KEY")) {
-                        let row = localDataStore.find(i => i["ID Request"] === id);
-                        if(row) { row.STATUS = result.value.status; row.REMARKS = result.value.remarks; }
-                        Swal.fire({ title: 'Terupdate!', text: 'Simulasi status alur hybrid berhasil.', icon: 'success' });
-                        renderTables(); calculateMetrics(); return;
-                    }
-                    $.post(API_URL, JSON.stringify(result.value), function(res) {
-                        if(res.status === "success") { Swal.fire({ title: 'Berhasil!', text: 'Status dokumen fisik selaras dengan database.', icon: 'success' }); fetchBackendData(); }
-                    }, "json");
+                    Swal.fire({ title: 'Mengirim status...', didOpen: () => Swal.showLoading() });
+                    
+                    fetch(API_URL, {
+                        method: 'POST',
+                        mode: 'cors',
+                        body: JSON.stringify(result.value)
+                    })
+                    .then(response => response.json())
+                    .then(res => {
+                        if(res.status === "success") {
+                            Swal.fire({ title: 'Berhasil!', text: 'Status database tersinkronisasi.', icon: 'success' });
+                            fetchBackendData();
+                        }
+                    });
                 }
             });
         }
 
         function initCharts() {
-            Chart.defaults.font.family = "'Inter', sans-serif";
             chartYearlyObj = new Chart(document.getElementById('chartYearly').getContext('2d'), {
                 type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets: [{ data: [15,22,18,34,25,40,0,0,0,0,0,0], borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.03)', fill:true, tension:0.3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
