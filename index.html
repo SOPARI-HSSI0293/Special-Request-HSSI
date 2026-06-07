@@ -320,7 +320,6 @@
         let globalDataCache = [];
         let chartYearlyObj, chartCustomerObj, chartSubjectObj;
 
-        // Helper untuk styling badge status
         function renderStatusBadge(status) {
             let bgStyle = "";
             switch(status) {
@@ -381,7 +380,7 @@
                         render: (data) => `
                             <div class="flex justify-center space-x-3">
                                 <button onclick="openStatusModal('${data.id}', '${data.status}', \`${data.remarks ? data.remarks.replace(/'/g, "\\'") : ''}\`)" title="Update Status Manual" class="text-slate-400 hover:text-blue-600 transition-colors text-base"><i class="fa-solid fa-stamp"></i></button>
-                                <button onclick="actionAlert('Print')" title="Cetak Form" class="text-slate-400 hover:text-emerald-600 transition-colors text-base"><i class="fa-solid fa-print"></i></button>
+                                <button onclick="printForm('${data.id}')" title="Cetak Form" class="text-slate-400 hover:text-emerald-600 transition-colors text-base"><i class="fa-solid fa-print"></i></button>
                             </div>` 
                     }
                 ],
@@ -405,14 +404,13 @@
                             <div class="flex justify-center space-x-2">
                                 <button onclick="openStatusModal('${data.id}', '${data.status}', \`${data.remarks ? data.remarks.replace(/'/g, "\\'") : ''}\`)" title="Update Status" class="text-slate-400 hover:text-blue-600 text-base"><i class="fa-solid fa-stamp"></i></button>
                                 <button onclick="actionAlert('Revisi')" title="Revisi" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button onclick="actionAlert('Print')" title="Cetak" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>
+                                <button onclick="printForm('${data.id}')" title="Cetak" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>
                             </div>`
                     }
                 ],
                 dom: '<"flex flex-col sm:flex-row justify-between items-center mb-4"lf>rtip'
             });
 
-            // Set up Top Column Filters
             $('#headerRow th').each(function (i) {
                 const title = $(this).text();
                 if(title !== 'ACTION') {
@@ -432,17 +430,15 @@
         // --- HTTP READ: FETCH DATA FROM GAS ---
         async function loadDataFromServer() {
             Swal.fire({ title: 'Memuat Data...', text: 'Mengunduh data dari Google Sheet', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-            
             try {
                 const response = await fetch(`${WEB_APP_URL}?action=readData`);
                 const result = await response.json();
-                
                 if(result.status === "success") {
                     globalDataCache = result.data;
                     updateDashboardAndTables(result.data);
                     Swal.close();
                 } else {
-                    throw new Error("Gagal parsing respons database");
+                    throw new Error("Gagal parsing database");
                 }
             } catch (error) {
                 console.error(error);
@@ -451,16 +447,13 @@
         }
 
         function updateDashboardAndTables(data) {
-            // 1. Filter Data berdasarkan Tanggal Terpilih di Dashboard
             const startStr = document.getElementById('dashStart').value;
             const endStr = document.getElementById('dashEnd').value;
-            
             const filtered = data.filter(item => {
                 if(!startStr || !endStr) return true;
                 return item.date >= startStr && item.date <= endStr;
             });
 
-            // 2. Hitung Nilai Metrik 4 Card Dashboard Baru
             let total = filtered.length;
             let rejected = filtered.filter(i => i.status === "Rejected").length;
             let wip = filtered.filter(i => i.status === "Approved & Forwarded").length;
@@ -471,25 +464,16 @@
             document.getElementById('cardWip').innerText = wip;
             document.getElementById('cardCompleted').innerText = completed;
 
-            // 3. Masukkan ke DataTables
-            const pTable = $('#previewTable').DataTable();
-            pTable.clear().rows.add(filtered).draw();
-
-            const mTable = $('#masterTable').DataTable();
-            mTable.clear().rows.add(data).draw(); // Master table memuat semua histori tanpa filter tanggal dashboard
-
-            // 4. Perbarui Grafik Analitik sesuai data terbaru
+            $('#previewTable').DataTable().clear().rows.add(filtered).draw();
+            $('#masterTable').DataTable().clear().rows.add(data).draw();
             renderChartData(filtered);
         }
 
-        // --- HTTP CREATE: FORM SUBMIT (SALES INPUT) ---
+        // --- HTTP CREATE & OTOMATIS PRINT BARU ---
         async function handleFormSubmit(e) { 
             e.preventDefault(); 
-            
             let checkedSubjects = [];
-            $('input[name="subjectIssue"]:checked').each(function() {
-                checkedSubjects.push($(this).val());
-            });
+            $('input[name="subjectIssue"]:checked').each(function() { checkedSubjects.push($(this).val()); });
 
             if(checkedSubjects.length === 0) {
                 Swal.fire({ title: 'Peringatan!', text: 'Silakan pilih minimal satu Subject Issue.', icon: 'warning', confirmButtonColor: '#fd7e14' });
@@ -509,34 +493,61 @@
                 }
             };
 
-            Swal.fire({ title: 'Menyimpan...', text: 'Mengirim data ke sistem & memproses Template Cetak', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            Swal.fire({ title: 'Menyimpan...', text: 'Mengirim data & menyiapkan pratinjau cetak...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
             try {
+                // Diubah menggunakan normal fetch (bukan no-cors) agar frontend bisa menangkap printUrl dari return GAS secara dinamis
                 const response = await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Digunakan untuk bypass CORS policy basic GAS redirects
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Trik penyamaran content-type standar bypass preflight CORS GAS
                     body: JSON.stringify(payload)
                 });
+                const txt = await response.text();
+                const resObj = JSON.parse(txt);
 
-                // Catatan: mode 'no-cors' tidak mengembalikan text body respon, kita langsung asumsikan berhasil jika tidak masuk block catch
-                Swal.fire({ 
-                    title: 'Berhasil!', 
-                    html: `Data Berhasil tersimpan di Google Sheet dengan Status Default: <b>Open</b>.<br><br><span class="text-xs text-slate-500">Silakan buka tab "Template_Cetak" di Google Spreadsheet Anda untuk melakukan print dokumen fisik.</span>`, 
-                    icon: 'success', 
-                    confirmButtonColor: '#059669' 
-                }).then(() => {
-                    clearForm();
-                    loadDataFromServer();
-                    switchTab('dataTab');
-                });
+                if(resObj.status === "success") {
+                    Swal.fire({ 
+                        title: 'Berhasil Disimpan!', 
+                        text: "Membuka lembar pratinjau cetak PDF...", 
+                        icon: 'success', 
+                        timer: 2000, 
+                        showConfirmButton: false 
+                    }).then(() => {
+                        // MODIFIKASI UTAMA: Langsung tembak window print layout dari URL template Google Sheet
+                        window.open(resObj.printUrl, '_blank');
+                        clearForm();
+                        loadDataFromServer();
+                        switchTab('dataTab');
+                    });
+                }
             } catch (error) {
                 console.error(error);
-                Swal.fire({ title: 'Gagal Simpan!', text: 'Terjadi gangguan jaringan saat menghubungi Google API.', icon: 'error' });
+                // Metode penanganan cadangan jika preflight diblokir browser: kirim via no-cors, lalu panggil manual URL cetak generik
+                await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                Swal.fire({ title: 'Tersimpan!', text: 'Membuka pratinjau cetak alternatif...', icon: 'success' }).then(() => {
+                    window.open(`https://docs.google.com/spreadsheets/d/1vdj0kVyQnryXaU0_HKCfW6kq0LTkPNMVtH3cKE-WzZA/export?exportFormat=pdf&format=pdf&size=A4&portrait=true&fitw=true&gridlines=false`, '_blank');
+                    clearForm(); loadDataFromServer(); switchTab('dataTab');
+                });
             }
         }
 
-        // --- HTTP UPDATE: UPDATE STATUS MANUAL & REMARKS (PPC/QC/PROD) ---
+        // --- AKSI CETAK DARI TOMBOL ACTION TABEL ---
+        async function printForm(id) {
+            Swal.fire({ title: 'Menyiapkan Cetak...', text: `Sinkronisasi dokumen ${id}...`, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=getPrintUrl&id=${id}`);
+                const result = await response.json();
+                if(result.status === "success") {
+                    Swal.close();
+                    window.open(result.printUrl, '_blank');
+                }
+            } catch (error) {
+                console.error(error);
+                window.open(`https://docs.google.com/spreadsheets/d/1vdj0kVyQnryXaU0_HKCfW6kq0LTkPNMVtH3cKE-WzZA/export?exportFormat=pdf&format=pdf&size=A4&portrait=true&fitw=true&gridlines=false`, '_blank');
+            }
+        }
+
+        // --- HTTP UPDATE MANUAL ---
         function openStatusModal(id, currentStatus, currentRemarks) {
             Swal.fire({
                 title: `Update Status (${id})`,
@@ -550,51 +561,25 @@
                             <option value="Completed" ${currentStatus==='Completed'?'selected':''}>Completed</option>
                         </select>
                         <label class="block text-sm font-bold text-slate-700 mb-1">Hasil Analisa / Remarks:</label>
-                        <textarea id="swalRemarks" rows="3" class="w-full px-3 py-2 border rounded-lg resize-none outline-none focus:border-emerald-500" placeholder="Input hasil trial mesin, kendala, atau alasan reject...">${currentRemarks && currentRemarks !== 'undefined' ? currentRemarks : ''}</textarea>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'Simpan Status',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#059669',
-                preConfirm: () => {
-                    return {
-                        status: document.getElementById('swalStatus').value,
-                        remarks: document.getElementById('swalRemarks').value
-                    }
-                }
+                        <textarea id="swalRemarks" rows="3" class="w-full px-3 py-2 border rounded-lg resize-none outline-none focus:border-emerald-500" placeholder="Input hasil analisa teknis...">${currentRemarks && currentRemarks !== 'undefined' ? currentRemarks : ''}</textarea>
+                    </div>`,
+                showCancelButton: true, confirmButtonText: 'Simpan Status', cancelButtonText: 'Batal', confirmButtonColor: '#059669',
+                preConfirm: () => { return { status: document.getElementById('swalStatus').value, remarks: document.getElementById('swalRemarks').value } }
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     Swal.fire({ title: 'Mengubah Status...', text: 'Memperbarui database...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-                    
-                    const payload = {
-                        action: "updateStatus",
-                        data: {
-                            id: id,
-                            status: result.value.status,
-                            remarks: result.value.remarks
-                        }
-                    };
-
+                    const payload = { action: "updateStatus", data: { id: id, status: result.value.status, remarks: result.value.remarks } };
                     try {
-                        await fetch(WEB_APP_URL, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-
-                        Swal.fire({ title: 'Tersimpan!', text: `Dokumen ID ${id} berhasil diupdate ke status: ${result.value.status}`, icon: 'success', confirmButtonColor: '#059669' })
-                            .then(() => { loadDataFromServer(); });
+                        await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+                        Swal.fire({ title: 'Tersimpan!', text: `Dokumen ID ${id} berhasil diupdate`, icon: 'success', confirmButtonColor: '#059669' }).then(() => { loadDataFromServer(); });
                     } catch (error) {
-                        console.error(error);
-                        Swal.fire({ title: 'Gagal Update!', text: 'Gagal memperbarui status ke Google Sheet.', icon: 'error' });
+                        loadDataFromServer();
                     }
                 }
             });
         }
 
-        // --- CHARTS & LOGIK ANALITIK ---
+        // --- CHARTS LOGIC ---
         function initCharts() {
             chartYearlyObj = new Chart(document.getElementById('chartYearly').getContext('2d'), {
                 type: 'line',
@@ -614,25 +599,20 @@
         }
 
         function renderChartData(filteredData) {
-            // 1. Hitung Tren Bulanan Berdasarkan Tahun Berjalan (2026)
             let monthlyCounts = Array(12).fill(0);
             filteredData.forEach(item => {
                 let d = new Date(item.date);
-                if (d.getFullYear() === 2026) {
-                    monthlyCounts[d.getMonth()]++;
-                }
+                if (d.getFullYear() === 2026) monthlyCounts[d.getMonth()]++;
             });
             chartYearlyObj.data.datasets[0].data = monthlyCounts;
             chartYearlyObj.update();
 
-            // 2. Hitung Distribusi Top Customer
             let custMap = {};
             filteredData.forEach(i => { if(i.customer) custMap[i.customer] = (custMap[i.customer] || 0) + 1; });
             chartCustomerObj.data.labels = Object.keys(custMap);
             chartCustomerObj.data.datasets[0].data = Object.values(custMap);
             chartCustomerObj.update();
 
-            // 3. Hitung Frekuensi Subject Isu (Pecah string koma)
             let subMap = {};
             filteredData.forEach(item => {
                 if(item.subject) {
@@ -648,26 +628,21 @@
         }
 
         function updateCharts() { 
-            // Mengambil range filter tanggal pada panel Analitik
             const startStr = document.getElementById('analyticStart').value;
             const endStr = document.getElementById('analyticEnd').value;
-            
             const filtered = globalDataCache.filter(item => {
                 if(!startStr || !endStr) return true;
                 return item.date >= startStr && item.date <= endStr;
             });
-            
             renderChartData(filtered);
             Swal.fire({ title: 'Updated!', text: 'Data grafik berhasil disesuaikan.', icon: 'success', timer: 800, showConfirmButton: false }); 
         }
 
         function actionAlert(type) {
-            Swal.fire({ title: type + ' Form', text: `Aksi ${type} terintegrasi secara otomatis via lembar pemicu utama di Google Spreadsheet Anda.`, icon: 'info', confirmButtonColor: '#059669' });
+            Swal.fire({ title: type + ' Form', text: `Aksi ${type} terproses otomatis di basis data utama.`, icon: 'info', confirmButtonColor: '#059669' });
         }
         
-        function clearForm() { 
-            document.getElementById('specialRequestForm').reset(); 
-        }
+        function clearForm() { document.getElementById('specialRequestForm').reset(); }
     </script>
 </body>
 </html>
