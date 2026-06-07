@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpecReq Hub - Core System</title>
     
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap)" rel="stylesheet">
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="[https://cdn.jsdelivr.net/npm/sweetalert2@11](https://cdn.jsdelivr.net/npm/sweetalert2@11)"></script>
-    <script src="[https://code.jquery.com/jquery-3.7.0.min.js](https://code.jquery.com/jquery-3.7.0.min.js)"></script>
-    <link rel="stylesheet" href="[https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css](https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css)">
-    <script src="[https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js](https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js)"></script>
-    <script src="[https://cdn.jsdelivr.net/npm/chart.js](https://cdn.jsdelivr.net/npm/chart.js)"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f4f7fe; }
@@ -116,15 +116,15 @@
                     </div>
                 </div>
 
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold text-slate-800">5 Logs Aktivitas Terbaru</h3>
-                    <button onclick="switchTab('formTab')" class="bg-purple-600 text-white font-bold px-6 py-2.5 rounded-lg shadow-md hover:bg-purple-700 transition-all flex items-center">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                    <h3 class="text-xl font-bold text-slate-800">Database & Logs Terbaru</h3>
+                    <button onclick="switchTab('formTab')" class="bg-purple-600 text-white font-bold px-6 py-2.5 rounded-lg shadow-md hover:bg-purple-700 transition-all flex items-center flex-shrink-0 whitespace-nowrap">
                         <i class="fa-solid fa-plus mr-2"></i> New Request
                     </button>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 overflow-x-auto w-full">
-                    <table id="previewTable" class="w-full text-left text-sm text-slate-600">
+                    <table id="previewTable" class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
                         <thead>
                             <tr>
                                 <th>ID Request</th>
@@ -149,9 +149,9 @@
                         <div class="mb-8">
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-circle-user text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Informasi Pemohon</h4></div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div><label class="form-label">Tanggal <span class="req-star">*</span></label><input type="date" required id="dateInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
-                                <div><label class="form-label">PIC Request <span class="req-star">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nama Sales Inside"></div>
-                                <div><label class="form-label">Departemen Pengaju <span class="req-star">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="Quality Control">Quality Control</option></select></div>
+                                <div><label class="form-label">Tanggal <span class="text-red-500">*</span></label><input type="date" required id="dateInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
+                                <div><label class="form-label">PIC Request <span class="text-red-500">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nama Sales Inside"></div>
+                                <div><label class="form-label">Departemen Pengaju <span class="text-red-500">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="Quality Control">Quality Control</option></select></div>
                             </div>
                         </div>
                         
@@ -159,7 +159,7 @@
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-box text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Identitas Pesanan / Produk</h4></div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div><label class="form-label">Customer Name</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="PT. / CV. Penerima"></div>
-                                <div><label class="form-label">Process Order (PO) No <span class="req-star">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor PO Unik"></div>
+                                <div><label class="form-label">Process Order (PO) No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor PO Unik"></div>
                             </div>
                         </div>
                         
@@ -167,7 +167,7 @@
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-comment-dots text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Detail Kondisi Khusus / Request</h4></div>
                             <div class="space-y-5">
                                 <div>
-                                    <label class="form-label">Subject Issue (Pilih minimal satu) <span class="req-star">*</span></label>
+                                    <label class="form-label">Subject Issue (Pilih minimal satu) <span class="text-red-500">*</span></label>
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200" id="subjectCheckboxGroup">
                                         <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Urgent Delivery" class="w-4 h-4 text-emerald-600 rounded"><span>Urgent Delivery</span></label>
                                         <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Urgent Proses" class="w-4 h-4 text-emerald-600 rounded"><span>Urgent Proses</span></label>
@@ -178,7 +178,7 @@
                                         <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Out of Standart" class="w-4 h-4 text-emerald-600 rounded"><span>Out of Standart</span></label>
                                     </div>
                                 </div>
-                                <div><label class="form-label">Deskripsi Lengkap Request <span class="req-star">*</span></label><textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 resize-none" placeholder="Tulis instruksi khusus yang diajukan secara mendetail..."></textarea></div>
+                                <div><label class="form-label">Deskripsi Lengkap Request <span class="text-red-500">*</span></label><textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 resize-none" placeholder="Tulis instruksi khusus yang diajukan secara mendetail..."></textarea></div>
                             </div>
                         </div>
                         <div class="flex justify-end gap-3 pt-4">
@@ -195,7 +195,7 @@
                         <h3 class="text-lg font-bold text-emerald-800 tracking-tight"><i class="fa-solid fa-database mr-2"></i>Database Master Data (Urutan Terbaru Paling Atas)</h3>
                     </div>
                     <div class="p-6 overflow-x-auto w-full">
-                        <table id="masterTable" class="w-full text-left text-sm text-slate-600 cell-border">
+                        <table id="masterTable" class="w-full text-left text-sm text-slate-600 whitespace-nowrap cell-border">
                             <thead>
                                 <tr class="filter-header" id="filterRow"></tr>
                                 <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>Customer</th><th>Subject Issue</th><th>Department</th><th>PIC Pengaju</th><th>Status</th><th>Action</th></tr>
@@ -285,16 +285,13 @@
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
-        // FETCH REAL DATA DARI APPS SCRIPT
         function fetchBackendData() {
-            // Jika mode stand-alone / belum pasang API URL, gunakan mock data
             if(API_URL.includes("MOCK_API_KEY")) {
-                console.log("Menggunakan data simulasi lokal. Pasang API_URL untuk koneksi Google Sheets asli.");
                 localDataStore = [
                     { "ID Request": "SR-260601-01", "DATE": "2026-06-01", "CUSTOMER": "PT. Astra", "PROCESS_ORDER_NO": "PO-100", "SUBJECT": "Material Substitution, Sample", "DEPARTMENT": "Sales", "PIC": "Dewi K", "STATUS": "Open", "REMARKS": "-" },
                     { "ID Request": "SR-260603-01", "DATE": "2026-06-03", "CUSTOMER": "PT. Toyota Motor", "PROCESS_ORDER_NO": "PO-105", "SUBJECT": "Urgent Proses", "DEPARTMENT": "Sales", "PIC": "Rian H", "STATUS": "Approved", "REMARKS": "Forwarded to Line 2" },
                     { "ID Request": "SR-260605-01", "DATE": "2026-06-05", "CUSTOMER": "CV. Bahagia", "PROCESS_ORDER_NO": "PO-110", "SUBJECT": "Out of Standart", "DEPARTMENT": "Sales", "PIC": "Dewi K", "STATUS": "Rejected", "REMARKS": "Spec Not Match" },
-                    { "ID Request": "SR-260607-01", "DATE": "2026-06-07", "CUSTOMER": "PT. Hanwa Indonesia", "PROCESS_ORDER_NO": "PO-200", "SUBJECT": "Trial Machine, Trial Proses", "DEPARTMENT": "Sales", "PIC": "Sopari", "STATUS": "Completed", "REMARKS": "Trial sukses hasil OK" }
+                    { "ID Request": "SR-260607-01", "DATE": "2026-06-07", "CUSTOMER": "PT. Hanwa Indonesia", "PROCESS_ORDER_NO": "PO-200", "SUBJECT": "Trial Machine, Trial Proses", "DEPARTMENT": "Sales", "PIC": "Budi T", "STATUS": "Completed", "REMARKS": "Trial sukses hasil OK" }
                 ];
                 renderTables();
                 calculateMetrics();
@@ -311,12 +308,9 @@
         }
 
         function renderTables() {
-            // Hancurkan tabel jika sudah ada inisialisasi sebelumnya untuk menghindari error re-init
             if ($.fn.DataTable.isDataTable('#previewTable')) $('#previewTable').DataTable().destroy();
             if ($.fn.DataTable.isDataTable('#masterTable')) { $('#masterTable').DataTable().destroy(); $('#filterRow').empty(); }
 
-            // LOGIK MEMASTIKAN DATA TERBARU PALING ATAS (Urutkan Berdasarkan ID Request Descending)
-            // Kolom ke-0 (ID Request) di-set DESC
             dtPreview = $('#previewTable').DataTable({
                 data: localDataStore,
                 columns: [
@@ -328,7 +322,7 @@
                     { data: 'STATUS', render: d => renderStatusBadge(d) },
                     { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row['ID Request']) }
                 ],
-                order: [[0, 'desc']], // Paling baru paling atas
+                order: [[0, 'desc']],
                 paging: true, pageLength: 5, searching: false, info: false, lengthChange: false
             });
 
@@ -344,14 +338,13 @@
                     { data: 'STATUS', render: d => renderStatusBadge(d) },
                     { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row['ID Request']) }
                 ],
-                order: [[0, 'desc']], // Paling baru paling atas
+                order: [[0, 'desc']],
                 dom: '<"flex flex-col sm:flex-row justify-between items-center mb-4"lf>rtip'
             });
 
-            // Bangun Top Filters Untuk Data Master
             $('#headerRow th').each(function (i) {
                 const title = $(this).text();
-                if(title !== 'ACTION') {
+                if(title !== 'ACTION' && title !== 'Action') {
                     $('<input type="text" placeholder="Filter ' + title + '" />')
                         .appendTo($('<th class="p-2"></th>').appendTo('#filterRow'))
                         .on('keyup change', function () {
@@ -377,22 +370,16 @@
                 </div>`;
         }
 
-        // HITUNG KARTU METRIK BERDASARKAN RENTANG WAKTU
         function calculateMetrics() {
             const start = document.getElementById('dashStart').value;
             const end = document.getElementById('dashEnd').value;
             
             let filtered = localDataStore.filter(item => item.DATE >= start && item.DATE <= end);
             
-            let total = filtered.length;
-            let rejected = filtered.filter(i => i.STATUS === "Rejected").length;
-            let wip = filtered.filter(i => i.STATUS === "Approved").length;
-            let completed = filtered.filter(i => i.STATUS === "Completed").length;
-
-            $('#cardTotal').text(total);
-            $('#cardRejected').text(rejected);
-            $('#cardWip').text(wip);
-            $('#cardCompleted').text(completed);
+            $('#cardTotal').text(filtered.length);
+            $('#cardRejected').text(filtered.filter(i => i.STATUS === "Rejected").length);
+            $('#cardWip').text(filtered.filter(i => i.STATUS === "Approved").length);
+            $('#cardCompleted').text(filtered.filter(i => i.STATUS === "Completed").length);
 
             updateChartGraphics(filtered);
         }
@@ -402,15 +389,10 @@
             Swal.fire({ title: 'Data Diperbarui!', text: 'Metrik & grafik disesuaikan.', icon: 'success', timer: 1000, showConfirmButton: false });
         }
 
-        // ENGINE SUBMIT FORM INPUT
         function handleFormSubmit(e) {
             e.preventDefault();
-            
-            // Baca Multi-Checkbox Subject
             let selectedSubjects = [];
-            $('input[name="subjectIssue"]:checked').each(function() {
-                selectedSubjects.push($(this).val());
-            });
+            $('input[name="subjectIssue"]:checked').each(function() { selectedSubjects.push($(this).val()); });
 
             if(selectedSubjects.length === 0) {
                 Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu pilihan Subject Issue.', icon: 'error', confirmButtonColor: '#ef4444' });
@@ -433,9 +415,7 @@
             if(API_URL.includes("MOCK_API_KEY")) {
                 setTimeout(() => {
                     Swal.fire({ title: 'Sukses Terpaku!', text: 'Simpan simulasi berhasil. ID Baru di-generate otomatis oleh backend GAS.', icon: 'success' });
-                    clearForm();
-                    fetchBackendData();
-                    switchTab('dataTab');
+                    clearForm(); fetchBackendData(); switchTab('dataTab');
                 }, 1000);
                 return;
             }
@@ -443,38 +423,28 @@
             $.post(API_URL, JSON.stringify(payload), function(res) {
                 if(res.status === "success") {
                     Swal.fire({ title: 'Berhasil Disimpan!', text: 'Tercatat dengan ID unik: ' + res.id, icon: 'success', confirmButtonColor: '#10b981' });
-                    clearForm();
-                    fetchBackendData();
-                    switchTab('dataTab');
+                    clearForm(); fetchBackendData(); switchTab('dataTab');
                 }
             }, "json");
         }
 
         function clearForm() { document.getElementById('specialRequestForm').reset(); document.getElementById('dateInput').valueAsDate = new Date(); }
 
-        // AUTOMATED PRINT PREVIEW ENGINE VIA SHEET COPYING LOGIC
         function triggerPrintEngine(id) {
             Swal.fire({ title: 'Menghubungi Server...', text: 'GAS sedang menduplikasi Template_Cetak & menyusun berkas PDF.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
             if(API_URL.includes("MOCK_API_KEY")) {
-                setTimeout(() => {
-                    Swal.fire({ title: 'Simulasi Cetak!', text: 'Di sistem asli, perintah ini membuka link direct PDF render dari Spreadsheet aktif Anda lalu otomatis menghapus sheet salinannya.', icon: 'info' });
-                }, 1200);
+                setTimeout(() => Swal.fire({ title: 'Simulasi Cetak!', text: 'Di sistem asli, perintah ini membuka link direct PDF render dari Spreadsheet.', icon: 'info' }), 1200);
                 return;
             }
 
             $.get(API_URL + "?action=print&id=" + id, function(res) {
                 if(res.status === "success") {
-                    Swal.close();
-                    // Langsung buka link preview PDF di tab baru agar siap print out keras
-                    window.open(res.pdfUrl, '_blank');
-                } else {
-                    Swal.fire({ title: 'Gagal Cetak!', text: res.message, icon: 'error' });
-                }
+                    Swal.close(); window.open(res.pdfUrl, '_blank');
+                } else { Swal.fire({ title: 'Gagal Cetak!', text: res.message, icon: 'error' }); }
             });
         }
 
-        // DIALOG UPDATE STATUS ALUR HYBRID (PPC/QC STAMP)
         function openStatusUpdateModal(id) {
             Swal.fire({
                 title: 'Stempel Status Konfirmasi',
@@ -487,55 +457,36 @@
                     </select>
                     <input type="text" id="swalRemarks" class="w-full p-2 border rounded-lg" placeholder="Masukkan catatan hasil analisis/remarks produksi">
                 `,
-                showCancelButton: true,
-                confirmButtonText: 'Update Status',
-                confirmButtonColor: '#10b981',
-                preConfirm: () => {
-                    return {
-                        action: "updateStatus",
-                        id: id,
-                        status: document.getElementById('swalStatus').value,
-                        remarks: document.getElementById('swalRemarks').value
-                    }
-                }
+                showCancelButton: true, confirmButtonText: 'Update Status', confirmButtonColor: '#10b981',
+                preConfirm: () => ({ action: "updateStatus", id: id, status: document.getElementById('swalStatus').value, remarks: document.getElementById('swalRemarks').value })
             }).then((result) => {
                 if(result.isConfirmed) {
                     Swal.fire({ title: 'Memproses konfirmasi...', didOpen: () => Swal.showLoading() });
-                    
                     if(API_URL.includes("MOCK_API_KEY")) {
                         let row = localDataStore.find(i => i["ID Request"] === id);
                         if(row) { row.STATUS = result.value.status; row.REMARKS = result.value.remarks; }
                         Swal.fire({ title: 'Terupdate!', text: 'Simulasi status alur hybrid berhasil.', icon: 'success' });
-                        renderTables(); calculateMetrics();
-                        return;
+                        renderTables(); calculateMetrics(); return;
                     }
-
                     $.post(API_URL, JSON.stringify(result.value), function(res) {
-                        if(res.status === "success") {
-                            Swal.fire({ title: 'Berhasil!', text: 'Status dokumen fisik selaras dengan database.', icon: 'success' });
-                            fetchBackendData();
-                        }
+                        if(res.status === "success") { Swal.fire({ title: 'Berhasil!', text: 'Status dokumen fisik selaras dengan database.', icon: 'success' }); fetchBackendData(); }
                     }, "json");
                 }
             });
         }
 
-        // --- GRAPHICS LOGIC (CHART.JS) ---
         function initCharts() {
             Chart.defaults.font.family = "'Inter', sans-serif";
             chartYearlyObj = new Chart(document.getElementById('chartYearly').getContext('2d'), {
-                type: 'line',
-                data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets: [{ data: [15,22,18,34,25,40,0,0,0,0,0,0], borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.03)', fill:true, tension:0.3 }] },
+                type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets: [{ data: [15,22,18,34,25,40,0,0,0,0,0,0], borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.03)', fill:true, tension:0.3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
             chartCustomerObj = new Chart(document.getElementById('chartCustomer').getContext('2d'), {
-                type: 'doughnut',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: ['#0ea5e9','#10b981','#f59e0b','#8b5cf6','#ef4444'] }] },
+                type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#0ea5e9','#10b981','#f59e0b','#8b5cf6','#ef4444'] }] },
                 options: { responsive:true, maintainAspectRatio:false, cutout:'70%' }
             });
             chartSubjectObj = new Chart(document.getElementById('chartSubject').getContext('2d'), {
-                type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor:'#0ea5e9', borderRadius: 4 }] },
+                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor:'#0ea5e9', borderRadius: 4 }] },
                 options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins: { legend:{display:false} }, scales: { x:{ beginAtZero:true, ticks:{ stepSize:1 } } } }
             });
         }
@@ -545,18 +496,11 @@
             filteredData.forEach(row => {
                 let c = row.CUSTOMER || 'Unknown';
                 custCounts[c] = (custCounts[c] || 0) + 1;
-                
-                if(row.SUBJECT) {
-                    row.SUBJECT.split(', ').forEach(s => {
-                        subjCounts[s] = (subjCounts[s] || 0) + 1;
-                    });
-                }
+                if(row.SUBJECT) row.SUBJECT.split(', ').forEach(s => subjCounts[s] = (subjCounts[s] || 0) + 1);
             });
-
             chartCustomerObj.data.labels = Object.keys(custCounts);
             chartCustomerObj.data.datasets[0].data = Object.values(custCounts);
             chartCustomerObj.update();
-
             let sortedSubj = Object.entries(subjCounts).sort((a,b) => b[1] - a[1]);
             chartSubjectObj.data.labels = sortedSubj.map(i => i[0]);
             chartSubjectObj.data.datasets[0].data = sortedSubj.map(i => i[1]);
