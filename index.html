@@ -150,7 +150,7 @@
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-circle-user text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Informasi Pemohon</h4></div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div><label class="form-label">Tanggal <span class="text-red-500">*</span></label><input type="date" required id="dateInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
-                                <div><label class="form-label">PIC Request <span class="text-red-500">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nama Sales Inside"></div>
+                                <div><label class="form-label">PIC Request <span class="text-red-500">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nama Lengkap"></div>
                                 <div><label class="form-label">Departemen Pengaju <span class="text-red-500">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="Quality Control">Quality Control</option></select></div>
                             </div>
                         </div>
@@ -250,13 +250,14 @@
     </main>
 
     <script>
-        // TEMPELKAN URL DEPLOYMENT WEB APP (ANYONE) DARI GAS ANDA DI SINI
+        // TEMPELKAN URL DEPLOYMENT WEB APP ANDA DI BAWAH INI
         const API_URL = "https://script.google.com/macros/s/AKfycbyvSFkA1cGtELzxfQwvImva9AV7oXkuNp-rnhJtiIvmyhh0dK05Xzk5pcbdu3NmSecuig/exec"; 
         
         let localDataStore = [];
         let dtPreview, dtMaster;
         let chartYearlyObj, chartCustomerObj, chartSubjectObj;
 
+        // FUNGSI UTAMA SAAT APLIKASI PERTAMA KALI DIBUKA
         $(document).ready(function() {
             const date = new Date();
             const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -267,6 +268,9 @@
             ['dashEnd', 'analyticEnd'].forEach(id => document.getElementById(id).value = formatString(lastDay));
             document.getElementById('dateInput').valueAsDate = date;
 
+            // MEMAKSA HALAMAN DASHBOARD TERBUKA PERTAMA KALI
+            switchTab('dataTab');
+            
             initCharts();
             fetchBackendData();
         });
@@ -276,34 +280,23 @@
         function toggleSidebar() { $('#sidebar').toggleClass('w-64 w-20'); $('.sidebar-text').toggleClass('hidden'); }
 
         function switchTab(tabId) {
-            $('.view-section').addClass('hidden'); $('#' + tabId).removeClass('hidden');
+            $('.view-section').addClass('hidden'); 
+            $('#' + tabId).removeClass('hidden');
             $('.nav-btn').removeClass('bg-emerald-600 text-white shadow-md').addClass('text-slate-500');
             $('#nav-' + tabId).addClass('bg-emerald-600 text-white shadow-md').removeClass('text-slate-500');
             $('#pageTitle').text($('#nav-' + tabId + ' span').text());
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
-        // AMBIL DATA DARI BACKEND MENGGUNAKAN GET METHOD
         function fetchBackendData() {
-            if(API_URL.includes("YOUR_DEPLOYED_ID")) {
-                // Fail-safe Mock fallback jika URL belum diisi kustom
-                localDataStore = [
-                    { "ID Request": "SR-260601-01", "DATE": "2026-06-01", "CUSTOMER": "PT. Astra", "PROCESS_ORDER_NO": "PO-100", "SUBJECT": "Material Substitution, Sample", "DEPARTMENT": "Sales", "PIC": "Dewi K", "STATUS": "Open", "REMARKS": "-" },
-                    { "ID Request": "SR-260603-01", "DATE": "2026-06-03", "CUSTOMER": "PT. Toyota Motor", "PROCESS_ORDER_NO": "PO-105", "SUBJECT": "Urgent Proses", "DEPARTMENT": "Sales", "PIC": "Rian H", "STATUS": "Approved", "REMARKS": "Forwarded to Line 2" },
-                    { "ID Request": "SR-260605-01", "DATE": "2026-06-05", "CUSTOMER": "CV. Bahagia", "PROCESS_ORDER_NO": "PO-110", "SUBJECT": "Out of Standart", "DEPARTMENT": "Sales", "PIC": "Dewi K", "STATUS": "Rejected", "REMARKS": "Spec Not Match" },
-                    { "ID Request": "SR-260607-01", "DATE": "2026-06-07", "CUSTOMER": "PT. Hanwa Indonesia", "PROCESS_ORDER_NO": "PO-200", "SUBJECT": "Trial Machine", "DEPARTMENT": "Sales", "PIC": "Budi T", "STATUS": "Completed", "REMARKS": "Trial sukses hasil OK" }
-                ];
-                renderTables();
-                calculateMetrics();
-                return;
-            }
-
             $.get(API_URL + "?action=read", function(res) {
                 if(res.status === "success") {
                     localDataStore = res.data;
                     renderTables();
                     calculateMetrics();
                 }
+            }).fail(function() {
+                console.log("Koneksi gagal. Mungkin API_URL belum diganti.");
             });
         }
 
@@ -384,7 +377,7 @@
             updateChartGraphics(filtered);
         }
 
-        // PENERAPAN NATIVE FETCH UNTUK MENGHINDARI PREFLIGHT CORS BLOCK GOOGLE WEB APP
+        // PENGIRIMAN DATA FORM MENGGUNAKAN JQUERY POST STANDAR (Bypass CORS)
         function handleFormSubmit(e) {
             e.preventDefault();
             let selectedSubjects = [];
@@ -408,23 +401,17 @@
 
             Swal.fire({ title: 'Menyimpan...', text: 'Mengirim baris ke cloud database.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            // Menggunakan Native Fetch dengan text/plain (Simple Request) untuk menembus proteksi CORS GAS
-            fetch(API_URL, {
-                method: 'POST',
-                mode: 'cors',
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(res => {
+            $.post(API_URL, payload, function(res) {
                 if(res.status === "success") {
                     Swal.fire({ title: 'Berhasil!', text: 'ID Terdaftar: ' + res.id, icon: 'success' });
-                    clearForm(); fetchBackendData(); switchTab('dataTab');
+                    clearForm(); 
+                    fetchBackendData(); 
+                    switchTab('dataTab'); // Kembali ke dashboard setelah simpan sukses
                 } else {
-                    Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' });
+                    Swal.fire({ title: 'Gagal Menyimpan!', text: res.message, icon: 'error' });
                 }
-            })
-            .catch(err => {
-                Swal.fire({ title: 'Error Koneksi!', text: 'Periksa kembali deployment URL Web App GAS Anda.', icon: 'error' });
+            }, "json").fail(function() {
+                Swal.fire({ title: 'Error Koneksi!', text: 'Gagal menghubungi server GAS. Pastikan API_URL benar.', icon: 'error' });
             });
         }
 
@@ -436,6 +423,8 @@
                 if(res.status === "success") {
                     Swal.close(); window.open(res.pdfUrl, '_blank');
                 } else { Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); }
+            }).fail(function() {
+                Swal.fire({ title: 'Error Koneksi!', text: 'Gagal membuat file PDF.', icon: 'error' });
             });
         }
 
@@ -456,17 +445,15 @@
                 if(result.isConfirmed) {
                     Swal.fire({ title: 'Mengirim status...', didOpen: () => Swal.showLoading() });
                     
-                    fetch(API_URL, {
-                        method: 'POST',
-                        mode: 'cors',
-                        body: JSON.stringify(result.value)
-                    })
-                    .then(response => response.json())
-                    .then(res => {
+                    $.post(API_URL, result.value, function(res) {
                         if(res.status === "success") {
                             Swal.fire({ title: 'Berhasil!', text: 'Status database tersinkronisasi.', icon: 'success' });
                             fetchBackendData();
+                        } else {
+                            Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' });
                         }
+                    }, "json").fail(function() {
+                        Swal.fire({ title: 'Error Koneksi!', text: 'Gagal mengupdate status.', icon: 'error' });
                     });
                 }
             });
@@ -474,7 +461,7 @@
 
         function initCharts() {
             chartYearlyObj = new Chart(document.getElementById('chartYearly').getContext('2d'), {
-                type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets: [{ data: [15,22,18,34,25,40,0,0,0,0,0,0], borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.03)', fill:true, tension:0.3 }] },
+                type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets: [{ data: [0,0,0,0,0,0,0,0,0,0,0,0], borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.03)', fill:true, tension:0.3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
             chartCustomerObj = new Chart(document.getElementById('chartCustomer').getContext('2d'), {
