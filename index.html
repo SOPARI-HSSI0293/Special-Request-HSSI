@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Special Request System - Hybrid</title>
+    <title>Special Request System</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -24,10 +24,17 @@
         }
         table.dataTable tbody td { border-bottom: 1px solid #f1f5f9 !important; padding: 0.5rem 0.75rem !important; color: #475569; vertical-align: middle; }
         .filter-header input {
-            width: 100%; padding: 0.4rem 0.6rem; font-size: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; outline: none; color: #475569;
+            width: 100%; padding: 0.4rem 0.6rem; font-size: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; outline: none; font-weight: normal; color: #475569;
         }
+        .filter-header input:focus { border-color: #10b981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1); }
+        .dataTables_wrapper .dataTables_filter input { border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.375rem 0.75rem; margin-left: 0.5rem; outline: none; }
+        .dataTables_wrapper .dataTables_length select { border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.25rem 2rem 0.25rem 0.5rem; }
         .form-label { display: block; font-size: 0.875rem; font-weight: 600; color: #334155; margin-bottom: 0.375rem; }
         .req-star { color: #ef4444; margin-left: 0.125rem; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -40,6 +47,9 @@
                 </div>
                 <h1 class="text-lg font-bold text-slate-800 sidebar-text ml-3 whitespace-nowrap">SpecReq Hub</h1>
             </div>
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-emerald-600 focus:outline-none flex-shrink-0 transition-colors">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
         </div>
         <nav class="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
             <a href="#" onclick="switchTab('dataTab')" id="nav-dataTab" class="nav-btn flex items-center px-3 py-3 rounded-xl transition-colors">
@@ -55,13 +65,20 @@
                 <i class="fa-solid fa-database w-6 text-center text-lg flex-shrink-0"></i>
                 <span class="font-medium sidebar-text ml-2">Data Master</span>
             </a>
+            <a href="#" onclick="switchTab('analyticsTab')" id="nav-analyticsTab" class="nav-btn flex items-center px-3 py-3 rounded-xl transition-colors text-slate-500">
+                <i class="fa-solid fa-chart-line w-6 text-center text-lg flex-shrink-0"></i>
+                <span class="font-medium sidebar-text ml-2">Analitik</span>
+            </a>
         </nav>
+        <div class="p-4 text-[10px] text-slate-400 text-center border-t border-slate-100 sidebar-text">
+            Version 1.5 &copy; 2026 DevTeam
+        </div>
     </aside>
 
     <main class="flex-1 flex flex-col h-full overflow-y-auto w-full relative">
         <header class="bg-white/80 backdrop-blur-md h-16 flex items-center px-8 z-10 hidden md:flex justify-between sticky top-0 border-b border-slate-100">
             <h2 id="pageTitle" class="text-lg font-semibold text-slate-800 tracking-tight">Dashboard</h2>
-            <div class="text-sm text-slate-500 font-medium flex items-center">
+            <div class="flex items-center text-sm text-slate-500 font-medium">
                 <i class="fa-regular fa-clock mr-2 text-emerald-500"></i> <span id="currentTime"></span>
             </div>
         </header>
@@ -69,36 +86,50 @@
         <div class="p-4 md:px-8 md:py-6 flex-1">
             
             <div id="dataTab" class="view-section hidden max-w-7xl mx-auto block">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-blue-600 text-white p-5 rounded-xl shadow-sm flex justify-between items-center relative overflow-hidden">
-                        <div><p class="text-xs font-bold uppercase tracking-widest mb-1 opacity-90">Total Request Masuk</p><p id="cardTotal" class="text-3xl font-black">0</p></div>
-                        <i class="fa-solid fa-file-invoice text-5xl opacity-20"></i>
+                <div class="bg-[#d1f2f2] rounded-xl border border-[#a5e1e1] p-5 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-[#0a4f4f]">Ringkasan Data Analitik</h3>
+                        <p class="text-sm text-[#187a7a]">Menampilkan performa dan akurasi request secara real-time.</p>
                     </div>
-                    <div class="bg-red-500 text-white p-5 rounded-xl shadow-sm flex justify-between items-center relative overflow-hidden">
-                        <div><p class="text-xs font-bold uppercase tracking-widest mb-1 opacity-90">Ditolak (Rejected)</p><p id="cardRejected" class="text-3xl font-black">0</p></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-blue-500 text-white p-6 rounded-xl shadow-sm flex justify-between items-center relative overflow-hidden">
+                        <div><p class="text-xs font-bold uppercase tracking-widest mb-1 opacity-90">Total Request Masuk</p><p class="text-3xl font-black" id="cardTotal">0</p></div>
+                        <i class="fa-solid fa-file-lines text-5xl opacity-20"></i>
+                    </div>
+                    <div class="bg-red-500 text-white p-6 rounded-xl shadow-sm flex justify-between items-center relative overflow-hidden">
+                        <div><p class="text-xs font-bold uppercase tracking-widest mb-1 opacity-90">Ditolak (Rejected)</p><p class="text-3xl font-black" id="cardRejected">0</p></div>
                         <i class="fa-solid fa-circle-xmark text-5xl opacity-20"></i>
                     </div>
-                    <div class="bg-amber-500 text-white p-5 rounded-xl shadow-sm flex justify-between items-center relative overflow-hidden">
-                        <div><p class="text-xs font-bold uppercase tracking-widest mb-1 opacity-90">Diteruskan (WIP)</p><p id="cardWip" class="text-3xl font-black">0</p></div>
+                    <div class="bg-amber-500 text-white p-6 rounded-xl shadow-sm flex justify-between items-center relative overflow-hidden">
+                        <div><p class="text-xs font-bold uppercase tracking-widest mb-1 opacity-90">Diteruskan (WIP)</p><p class="text-3xl font-black" id="cardWip">0</p></div>
                         <i class="fa-solid fa-spinner text-5xl opacity-20 animate-spin-slow"></i>
                     </div>
-                    <div class="bg-emerald-500 text-white p-5 rounded-xl shadow-sm flex justify-between items-center relative overflow-hidden">
-                        <div><p class="text-xs font-bold uppercase tracking-widest mb-1 opacity-90">Selesai (Completed)</p><p id="cardCompleted" class="text-3xl font-black">0</p></div>
+                    <div class="bg-emerald-500 text-white p-6 rounded-xl shadow-sm flex justify-between items-center relative overflow-hidden">
+                        <div><p class="text-xs font-bold uppercase tracking-widest mb-1 opacity-90">Selesai (Completed)</p><p class="text-3xl font-black" id="cardCompleted">0</p></div>
                         <i class="fa-solid fa-square-check text-5xl opacity-20"></i>
                     </div>
                 </div>
 
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-slate-800">Antrean Kerja Logistik & Monitoring</h3>
-                    <button onclick="refreshDataRealtime()" class="bg-slate-800 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center">
-                        <i class="fa-solid fa-rotate mr-2"></i> Sync Cloud
+                    <h3 class="text-xl font-bold text-slate-800">Daftar Request Terbaru</h3>
+                    <button onclick="switchTab('formTab')" class="bg-emerald-600 text-white font-bold px-6 py-2.5 rounded-lg shadow-md hover:bg-emerald-700 transition-all flex items-center">
+                        <i class="fa-solid fa-plus mr-2"></i> New Request
                     </button>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 overflow-x-auto w-full">
                     <table id="previewTable" class="w-full text-left text-sm text-slate-600">
                         <thead>
-                            <tr><th>ID</th><th>DATE</th><th>CUSTOMER</th><th>SUBJECT</th><th>STATUS</th><th class="text-center">ACTION</th></tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>DATE</th>
+                                <th>CUSTOMER</th>
+                                <th>SUBJECT</th>
+                                <th>STATUS</th>
+                                <th class="text-center">ACTION</th>
+                            </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -110,43 +141,62 @@
                     <div class="bg-white border-b border-slate-100 px-8 py-5"><h3 class="text-xl font-bold text-slate-800">Form Special Request</h3></div>
                     <form id="specialRequestForm" class="p-8" onsubmit="handleFormSubmit(event)">
                         <div class="mb-8">
+                            <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-circle-user text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Informasi Umum</h4></div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div><label class="form-label">Tanggal <span class="req-star">*</span></label><input type="date" required id="dateInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none"></div>
-                                <div><label class="form-label">PIC Request <span class="req-star">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none"></div>
-                                <div><label class="form-label">Departemen <span class="req-star">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="Quality Control">Quality Control</option></select></div>
+                                <div><label class="form-label">Tanggal <span class="req-star">*</span></label><input type="date" required id="dateInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
+                                <div><label class="form-label">PIC Request <span class="req-star">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
+                                <div><label class="form-label">Departemen <span class="req-star">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Production">Production</option><option value="Quality Control">Quality Control</option><option value="Sales">Sales</option></select></div>
                             </div>
                         </div>
                         <div class="mb-8">
+                            <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-box text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Detail Pesanan</h4></div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div><label class="form-label">Customer</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none"></div>
-                                <div><label class="form-label">Process Order No <span class="req-star">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none font-mono"></div>
+                                <div><label class="form-label">Customer</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
+                                <div><label class="form-label">Process Order No <span class="req-star">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono"></div>
                             </div>
                         </div>
                         <div class="mb-8">
-                            <label class="form-label">Subject Issue <span class="req-star">*</span></label>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200" id="subjectCheckboxGroup">
-                                <label class="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer"><input type="checkbox" name="subjectIssue" value="Urgent Delivery" class="w-4 h-4"><span>Urgent Delivery</span></label>
-                                <label class="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer"><input type="checkbox" name="subjectIssue" value="Urgent Proses" class="w-4 h-4"><span>Urgent Proses</span></label>
-                                <label class="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer"><input type="checkbox" name="subjectIssue" value="Sample" class="w-4 h-4"><span>Sample</span></label>
-                                <label class="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer"><input type="checkbox" name="subjectIssue" value="Trial Machine" class="w-4 h-4"><span>Trial Machine</span></label>
+                            <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-comment-dots text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Detail Request</h4></div>
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="form-label">Subject Issue <span class="req-star">*</span></label>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200" id="subjectCheckboxGroup">
+                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Urgent Delivery" class="w-4 h-4 text-emerald-600 rounded"> <span>Urgent Delivery</span></label>
+                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Urgent Proses" class="w-4 h-4 text-emerald-600 rounded"> <span>Urgent Proses</span></label>
+                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Sample" class="w-4 h-4 text-emerald-600 rounded"> <span>Sample</span></label>
+                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Trial Machine" class="w-4 h-4 text-emerald-600 rounded"> <span>Trial Machine</span></label>
+                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Trial material" class="w-4 h-4 text-emerald-600 rounded"> <span>Trial material</span></label>
+                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Trial Proses" class="w-4 h-4 text-emerald-600 rounded"> <span>Trial Proses</span></label>
+                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Out of Standart" class="w-4 h-4 text-emerald-600 rounded"> <span>Out of Standart</span></label>
+                                    </div>
+                                </div>
+                                <div><label class="form-label">Deskripsi Lengkap <span class="req-star">*</span></label><textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 resize-none"></textarea></div>
                             </div>
                         </div>
-                        <div class="mb-8">
-                            <label class="form-label">Deskripsi Lengkap <span class="req-star">*</span></label>
-                            <textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none resize-none"></textarea>
-                        </div>
-                        <div class="flex justify-end gap-3"><button type="button" onclick="clearForm()" class="px-6 py-2.5 bg-slate-100 rounded-lg text-slate-600">Reset</button><button type="submit" class="px-6 py-2.5 bg-emerald-600 text-white rounded-lg shadow-md">Submit & Print</button></div>
+                        <div class="flex justify-end gap-3 pt-4"><button type="button" onclick="clearForm()" class="px-6 py-2.5 text-slate-500 bg-slate-100 rounded-lg">Reset</button><button type="submit" class="px-6 py-2.5 text-white bg-emerald-600 rounded-lg shadow-md">Submit & Print</button></div>
                     </form>
                 </div>
             </div>
 
             <div id="tableTab" class="view-section hidden max-w-[98%] mx-auto block">
                 <div class="bg-white rounded-xl shadow-sm border border-emerald-100 overflow-hidden">
+                    <div class="px-5 py-4 border-b border-emerald-100 flex justify-between items-center bg-emerald-50">
+                        <h3 class="text-lg font-bold text-emerald-800 tracking-tight"><i class="fa-solid fa-database mr-2"></i>Database Master Data</h3>
+                    </div>
                     <div class="p-6 overflow-x-auto w-full">
                         <table id="masterTable" class="w-full text-left text-sm text-slate-600 cell-border">
                             <thead>
                                 <tr class="filter-header" id="filterRow"></tr>
-                                <tr><th>ID</th><th>DATE</th><th>CUSTOMER</th><th>SUBJECT</th><th>DEPARTMENT</th><th>STATUS</th><th>HASIL / REMARKS</th><th class="text-center">ACTION</th></tr>
+                                <tr id="headerRow">
+                                    <th>ID</th>
+                                    <th>DATE</th>
+                                    <th>CUSTOMER</th>
+                                    <th>SUBJECT</th>
+                                    <th>DEPARTMENT</th>
+                                    <th>STATUS</th>
+                                    <th>HASIL TRIAL / REMARKS</th>
+                                    <th class="text-center">ACTION</th>
+                                </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -157,156 +207,200 @@
         </div>
     </main>
 
-    <div id="statusModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center"><i class="fa-solid fa-stamp text-emerald-600 mr-2"></i>Update Pergerakan Dokumen</h3>
-            <input type="hidden" id="modalTargetId">
-            <div class="space-y-4">
-                <div>
-                    <label class="form-label">Status Alur Kerja</label>
-                    <select id="modalStatusSelect" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none bg-white">
-                        <option value="Open / Menunggu Fisik">Open / Menunggu Fisik</option>
-                        <option value="Approved & Forwarded">Approved & Forwarded (WIP)</option>
-                        <option value="Rejected">Rejected (Ditolak)</option>
-                        <option value="Completed">Completed (Selesai)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="form-label">Hasil Proses / Remarks Lapangan</label>
-                    <textarea id="modalRemarksInput" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none resize-none" placeholder="Masukkan poin hasil trial atau alasan reject..."></textarea>
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="closeStatusModal()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-semibold">Batal</button>
-                <button onclick="submitStatusUpdate()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold shadow-sm">Simpan Perubahan</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // --- TARUH URL DEPLOYMENT WEB APP ANDA DI SINI ---
+        // --- MASUKKAN URL DEPLOYMENT GOOGLE WEB APP ANDA DI SINI ---
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby0AJMewPxZOriX_sYX-wFhgjEKOEHJbHtjxmYCcQH3DDsiXXx2CTyYBBuZuZHj0WvBAQ/exec";
-        
-        let globalDatabase = [];
+
+        let serverData = [];
 
         $(document).ready(function() {
             document.getElementById('dateInput').valueAsDate = new Date();
-            refreshDataRealtime();
+            loadDataFromServer();
             switchTab('dataTab');
         });
 
         setInterval(() => { document.getElementById('currentTime').innerText = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }); }, 1000);
 
+        function toggleSidebar() { $('#sidebar').toggleClass('w-64 w-20'); $('.sidebar-text').toggleClass('hidden'); }
+
         function switchTab(tabId) {
-            $('.view-section').addClass('hidden'); $('#' + tabId).removeClass('hidden');
+            $('.view-section').addClass('hidden');
+            $('#' + tabId).removeClass('hidden');
             $('.nav-btn').removeClass('bg-emerald-600 text-white shadow-md').addClass('text-slate-500');
             $('#nav-' + tabId).addClass('bg-emerald-600 text-white shadow-md').removeClass('text-slate-500');
             $('#pageTitle').text($('#nav-' + tabId + ' span').text());
+            if(tabId === 'tableTab') $('#masterTable').DataTable().columns.adjust();
         }
 
-        // AMBIL DATA REALTIME DENGAN METODE JSONP (BEBAS CORS)
-        function refreshDataRealtime() {
-            Swal.fire({ title: 'Sinkronisasi...', text: 'Mengambil data dari Google Sheets Cloud', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-            
+        // LOAD REAL-TIME DARI DATABASE GOOGLE SHEET (JSONP CALLBACK BYPASS CORS)
+        function loadDataFromServer() {
             $.ajax({
                 url: WEB_APP_URL + "?action=readData",
                 type: "GET",
                 dataType: "jsonp",
-                crossDomain: true
+                jsonpCallback: "callback",
+                success: function(data) {
+                    serverData = data;
+                    updateDashboardCards(data);
+                    renderTables(data);
+                },
+                error: function() {
+                    console.log("Gagal sinkronisasi data dari Google Sheet Database.");
+                }
             });
         }
 
-        // Callback penampung JSONP yang dipanggil dari server script
-        function callback(data) {
-            Swal.close();
-            globalDatabase = data.reverse(); // Urutan data terbaru paling atas
-            calculateDashboardMetrics(globalDatabase);
-            buildDataTables();
-        }
-
-        // MENGHITUNG 4 CARD DASHBOARD SECARA AKURAT
-        function calculateDashboardMetrics(data) {
+        // HITUNG TOTAL BARIS UNTUK 4 CARD DASHBOARD SECARA AKURAT
+        function updateDashboardCards(data) {
             let total = data.length;
-            let rejected = data.filter(item => item.status.toLowerCase().includes('reject')).length;
-            let wip = data.filter(item => item.status.toLowerCase().includes('approved') || item.status.toLowerCase().includes('forwarded')).length;
-            let completed = data.filter(item => item.status.toLowerCase().includes('complete')).length;
-            
+            let rejected = data.filter(item => item.status === "Rejected").length;
+            let wip = data.filter(item => item.status === "Approved" || item.status === "WIP").length;
+            let completed = data.filter(item => item.status === "Completed").length;
+
             $('#cardTotal').text(total);
             $('#cardRejected').text(rejected);
             $('#cardWip').text(wip);
             $('#cardCompleted').text(completed);
         }
 
-        function buildDataTables() {
-            // Render Tabel Dashboard Utama
+        // KATEGORI WARNA BADGE STATUS
+        function getStatusBadge(status) {
+            status = status ? status : "Open";
+            if (status === "Rejected") return `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold border border-red-200">Rejected</span>`;
+            if (status === "Approved" || status === "WIP") return `<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-bold border border-amber-200">WIP (Production)</span>`;
+            if (status === "Completed") return `<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold border border-emerald-200">Completed</span>`;
+            return `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold border border-blue-200">Open</span>`;
+        }
+
+        function renderTables(data) {
+            // Render Tabel Dashboard (Batas 5 Data Terbaru)
             $('#previewTable').DataTable({
-                data: globalDatabase, destroy: true, searching: false, info: false, lengthChange: false, paging: true, pageLength: 5,
-                columns: [
+                data: data, destroy: true, order: [[0, "desc"]],
+                columns: [ 
                     { data: 'id' }, { data: 'date' }, { data: 'customer' }, { data: 'subject' },
+                    { data: 'status', render: (d) => getStatusBadge(d) },
                     { 
-                        data: 'status',
-                        render: (status) => {
-                            let color = "bg-blue-100 text-blue-700";
-                            if(status.toLowerCase().includes('reject')) color = "bg-red-100 text-red-700";
-                            if(status.toLowerCase().includes('approved')) color = "bg-amber-100 text-amber-700";
-                            if(status.toLowerCase().includes('complete')) color = "bg-emerald-100 text-emerald-700";
-                            return `<span class="px-2.5 py-1 rounded-full text-xs font-bold ${color}">${status}</span>`;
-                        }
-                    },
-                    { data: null, orderable: false, className: "text-center", render: (row) => `<button onclick="printDirect('${row.id}')" class="text-slate-500 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>` }
-                ]
+                        data: null, orderable: false, className: "text-center",
+                        render: (row) => `<button onclick="printDirect('${row.id}')" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>` 
+                    }
+                ],
+                paging: true, pageLength: 5, searching: false, info: false, lengthChange: false
             });
 
-            // Render Tabel Master Data
+            // Render Tabel Master Data Komplit
             const masterTable = $('#masterTable').DataTable({
-                data: globalDatabase, destroy: true, autoWidth: false,
+                data: data, destroy: true, order: [[0, "desc"]], autoWidth: false,
                 columns: [
-                    { data: 'id', width: '12%' }, { data: 'date', width: '10%' }, { data: 'customer', width: '15%' }, { data: 'subject', width: '18%' }, { data: 'dept', width: '10%' },
+                    { data: 'id' }, { data: 'date' }, { data: 'customer' }, { data: 'subject' }, { data: 'dept' },
+                    { data: 'status', render: (d) => getStatusBadge(d) },
+                    { data: 'remarks', render: (d) => d ? `<span class="font-medium text-slate-700">${d}</span>` : `<span class="text-slate-300 italic">Belum ada hasil</span>` },
                     { 
-                        data: 'status', width: '15%',
-                        render: (status) => {
-                            let color = "bg-blue-100 text-blue-700";
-                            if(status.toLowerCase().includes('reject')) color = "bg-red-100 text-red-700";
-                            if(status.toLowerCase().includes('approved')) color = "bg-amber-100 text-amber-700";
-                            if(status.toLowerCase().includes('complete')) color = "bg-emerald-100 text-emerald-700";
-                            return `<span class="px-2.5 py-1 rounded-full text-xs font-bold ${color}">${status}</span>`;
-                        }
-                    },
-                    { data: 'remarks', width: '15%', render: (txt) => txt ? `<span class="font-medium text-slate-700">${txt}</span>` : `<span class="text-slate-300 italic">Belum ada catatan</span>` },
-                    { 
-                        data: null, orderable: false, className: "text-center", width: '10%',
+                        data: null, orderable: false, className: "text-center whitespace-nowrap", 
                         render: (row) => `
-                            <div class="flex justify-center space-x-3 text-base">
-                                <button onclick="printDirect('${row.id}')" title="Print Form" class="text-slate-400 hover:text-blue-600"><i class="fa-solid fa-print"></i></button>
-                                <button onclick="openStatusModal('${row.id}', '${row.status}', '${row.remarks}')" title="Update Status Fisik" class="text-slate-400 hover:text-emerald-600"><i class="fa-solid fa-stamp"></i></button>
-                            </div>`
+                            <div class="flex justify-center space-x-3">
+                                <button onclick="openStatusModal('${row.id}', '${row.status}', '${row.remarks}')" title="Update Status & Remarks" class="text-blue-500 hover:text-blue-700 text-base"><i class="fa-solid fa-stamp"></i></button>
+                                <button onclick="printDirect('${row.id}')" title="Print File" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>
+                            </div>` 
                     }
-                ]
+                ],
+                dom: '<"flex flex-col sm:flex-row justify-between items-center mb-4"lf>rtip'
+            });
+
+            $('#filterRow').empty();
+            $('#headerRow th').each(function (i) {
+                const title = $(this).text();
+                if(title !== 'ACTION') {
+                    $('<input type="text" placeholder="' + title + '" />')
+                        .appendTo($('<th class="p-1"></th>').appendTo('#filterRow'))
+                        .on('keyup change', function () {
+                            if (masterTable.column(i).search() !== this.value) {
+                                masterTable.column(i).search(this.value).draw();
+                            }
+                        });
+                } else { $('<th class="p-1"></th>').appendTo('#filterRow'); }
             });
         }
 
-        // TRIGGER CETAK: MEMANGGIL PDF BERSIH BERDASARKAN METODE FILE COPY BARU
+        // POP-UP UPDATE STATUS PPC / QC / MANAGER (STEMPEL MODAL)
+        function openStatusModal(id, currentStatus, currentRemarks) {
+            Swal.fire({
+                title: `Update Progres Pemrosesan <br><span class="text-emerald-600 text-sm">${id}</span>`,
+                html: `
+                    <div class="text-left mt-3">
+                        <label class="form-label">Pergerakan Dokumen / Status:</label>
+                        <select id="swalStatus" class="w-full p-2 border rounded-lg mb-4 bg-white">
+                            <option value="Open" ${currentStatus==='Open'?'selected':''}>Open (Baru Masuk)</option>
+                            <option value="Rejected" ${currentStatus==='Rejected'?'selected':''}>Rejected (Ditolak PPC/QC)</option>
+                            <option value="Approved" ${currentStatus==='Approved'||currentStatus==='WIP'?'selected':''}>Approved / WIP (Diteruskan ke Produksi)</option>
+                            <option value="Completed" ${currentStatus==='Completed'?'selected':''}>Completed (Selesai Eksekusi)</option>
+                        </select>
+                        <label class="form-label">Hasil Trial / Catatan Khusus:</label>
+                        <textarea id="swalRemarks" rows="3" class="w-full p-2 border rounded-lg resize-none" placeholder="Masukkan hasil pengetesan mesin/material di sini...">${currentRemarks !== 'undefined' ? currentRemarks : ''}</textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-solid fa-floppy-disk mr-1"></i> Simpan',
+                confirmButtonColor: '#2563eb',
+                preConfirm: () => {
+                    return {
+                        status: document.getElementById('swalStatus').value,
+                        remarks: document.getElementById('swalRemarks').value
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'Memproses Data...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    
+                    $.ajax({
+                        url: `${WEB_APP_URL}?action=updateStatus&id=${id}&status=${encodeURIComponent(result.value.status)}&remarks=${encodeURIComponent(result.value.remarks)}`,
+                        type: "GET",
+                        dataType: "jsonp",
+                        jsonpCallback: "callback",
+                        success: function(res) {
+                            Swal.close();
+                            if (res.status === "success") {
+                                Swal.fire({ title: 'Berhasil!', text: 'Status dokumen berhasil diperbarui.', icon: 'success', timer: 1500, showConfirmButton: false });
+                                loadDataFromServer(); // Tarik data terbaru ke dashboard & master tabel
+                            } else {
+                                Swal.fire('Gagal!', res.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.close();
+                            Swal.fire('Error!', 'Gagal menghubungi server database.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        // HANDLER CETAK PDF TEMPORER
         function printDirect(id) {
-            Swal.fire({ title: 'Mempersiapkan File...', text: 'Mengkopi template & memproses PDF bersih berkode ID...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            Swal.fire({ title: 'Mempersiapkan Dokumen...', text: 'Membuat file preview berdasar ID...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            
             $.ajax({
                 url: WEB_APP_URL + "?action=getPrintUrl&id=" + id,
                 type: "GET",
                 dataType: "jsonp",
                 success: function(response) {
                     Swal.close();
-                    if(response.status === "success") { window.open(response.printUrl, '_blank'); }
-                }
+                    if(response.status === "success") {
+                        window.open(response.printUrl, '_blank');
+                    } else { Swal.fire('Gagal!', response.message, 'error'); }
+                },
+                error: function() { Swal.close(); Swal.fire('Error!', 'Gagal memproses salinan cetak temporer.', 'error'); }
             });
         }
 
-        // HANDLER INPUT SUBMIT SALES (MENCEGAH DOUBLE SAVE)
-        function handleFormSubmit(event) {
+        // HANDLER UTAMA INPUT FORM BARU (ANTI-DUPLIKASI)
+        function handleFormSubmit(event) { 
             event.preventDefault();
+
             let checkedSubjects = [];
             $('input[name="subjectIssue"]:checked').each(function() { checkedSubjects.push($(this).val()); });
 
             if(checkedSubjects.length === 0) {
-                Swal.fire({ title: 'Peringatan!', text: 'Silakan pilih minimal satu Subject Issue.', icon: 'warning' });
+                Swal.fire({ title: 'Peringatan!', text: 'Silakan pilih minimal satu Subject Issue.', icon: 'warning', confirmButtonColor: '#fd7e14' });
                 return;
             }
 
@@ -320,67 +414,33 @@
                 description: $('#detailInput').val()
             };
 
-            Swal.fire({ title: 'Menyimpan Data...', text: 'Mendaftarkan antrean kerja baru ke server...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            Swal.fire({ title: 'Menyimpan Data...', text: 'Menggandakan template dan menerbitkan PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
             $.ajax({
                 url: WEB_APP_URL,
                 type: "POST",
-                contentType: "text/plain; charset=utf-8",
+                contentType: "text/plain; charset=utf-8", 
                 data: JSON.stringify(formData),
                 success: function(response) {
+                    Swal.close();
                     let res = typeof response === "string" ? JSON.parse(response) : response;
+                    
                     if(res.status === "success") {
-                        Swal.fire({ title: 'Berhasil!', text: 'ID: ' + res.id + ' diterbitkan otomatis dengan status Open.', icon: 'success' }).then(() => {
+                        Swal.fire({ title: 'Berhasil Disimpan!', text: 'ID: ' + res.id + ' telah dibuat. Membuka PDF...', icon: 'success', confirmButtonColor: '#059669' }).then(() => {
                             window.open(res.printUrl, '_blank');
                             clearForm();
-                            refreshDataRealtime();
+                            loadDataFromServer(); // Sinkronisasi ulang dashboard
                             switchTab('dataTab');
                         });
-                    }
-                }
+                    } else { Swal.fire('Gagal!', res.message, 'error'); }
+                },
+                error: function() { Swal.close(); Swal.fire('Koneksi Gagal!', 'Periksa kembali deployment Web App GAS Anda.', 'error'); }
             });
         }
-
-        // MODAL SETTING MANUAL JALUR HYBRID (TIM PPC / QC)
-        function openStatusModal(id, currentStatus, currentRemarks) {
-            $('#modalTargetId').val(id);
-            $('#modalStatusSelect').val(currentStatus);
-            $('#modalRemarksInput').val(currentRemarks === "undefined" ? "" : currentRemarks);
-            $('#statusModal').removeClass('hidden');
-        }
-
-        function closeStatusModal() { $('#statusModal').addClass('hidden'); }
-
-        function submitStatusUpdate() {
-            const updatePayload = {
-                action: "updateStatus",
-                id: $('#modalTargetId').val(),
-                status: $('#modalStatusSelect').val(),
-                remarks: $('#modalRemarksInput').val()
-            };
-
-            closeStatusModal();
-            Swal.fire({ title: 'Memproses Status...', text: 'Memperbarui database cloud', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-
-            $.ajax({
-                url: WEB_APP_URL,
-                type: "POST",
-                contentType: "text/plain; charset=utf-8",
-                data: JSON.stringify(updatePayload),
-                success: function(response) {
-                    let res = typeof response === "string" ? JSON.parse(response) : response;
-                    if(res.status === "success") {
-                        Swal.fire({ title: 'Status Diperbarui!', text: 'Pergerakan fisik dokumen berhasil dicatat.', icon: 'success', timer: 1500, showConfirmButton: false });
-                        refreshDataRealtime();
-                    }
-                }
-            });
-        }
-
-        function clearForm() {
-            document.getElementById('specialRequestForm').reset();
-            document.getElementById('dateInput').valueAsDate = new Date();
-        }
+        
+        function clearForm() { document.getElementById('specialRequestForm').reset(); document.getElementById('dateInput').valueAsDate = new Date(); }
     </script>
+
+    <style> .animate-spin-slow { animation: spin 3s linear infinite; } @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } </style>
 </body>
 </html>
