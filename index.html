@@ -129,9 +129,9 @@
                             <tr>
                                 <th>ID Request</th>
                                 <th>Tanggal</th>
-                                <th>Customer</th>
-                                <th>Subject Issue</th>
+                                <th>PIC Pengaju</th>
                                 <th>Department</th>
+                                <th>Customer</th>
                                 <th>Status Alur</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -159,7 +159,7 @@
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-box text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Identitas Pesanan / Produk</h4></div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div><label class="form-label">Customer Name</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="PT. / CV. Penerima"></div>
-                                <div><label class="form-label">Process Order (PO) No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor PO Unik"></div>
+                                <div><label class="form-label">WOS Number <span class="text-red-500">*</span></label><input type="text" required id="wosInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor WOS"></div>
                             </div>
                         </div>
                         
@@ -198,7 +198,7 @@
                         <table id="masterTable" class="w-full text-left text-sm text-slate-600 whitespace-nowrap cell-border">
                             <thead>
                                 <tr class="filter-header" id="filterRow"></tr>
-                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>Customer</th><th>Subject Issue</th><th>Department</th><th>PIC Pengaju</th><th>Status</th><th>Action</th></tr>
+                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>PIC Pengaju</th><th>Department</th><th>Customer</th><th>WOS Number</th><th>Subject</th><th>Status</th><th>Action</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -250,14 +250,13 @@
     </main>
 
     <script>
-        // URL WEB APP APPS SCRIPT
+        // URL WEB APP APPS SCRIPT ASLI ANDA
         const API_URL = "https://script.google.com/macros/s/AKfycbyJSscSenINZE-z-7QeARx5qcHpiogte_0D7bxEuVmNDwVS9aPLQJyNZnRQU2qrkpWXMQ/exec"; 
         
         let localDataStore = [];
         let dtPreview, dtMaster;
         let chartYearlyObj, chartCustomerObj, chartSubjectObj;
 
-        // FUNGSI UTAMA SAAT APLIKASI PERTAMA KALI DIBUKA
         $(document).ready(function() {
             const date = new Date();
             const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -268,7 +267,7 @@
             ['dashEnd', 'analyticEnd'].forEach(id => document.getElementById(id).value = formatString(lastDay));
             document.getElementById('dateInput').valueAsDate = date;
 
-            // Memaksa Dashboard tampil pertama
+            // Memaksa Dashboard tampil utama
             switchTab('dataTab');
             
             initCharts();
@@ -288,42 +287,35 @@
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
-        // PERBAIKAN FATAL 1: PENGAMBILAN DATA & MAPPING INDEX-BASED KEBETULAN HEADER GOOGLE SHEET
+        // PEMBACAAN DATA SECARA REALTIME BERDASARKAN URUTAN INDEKS MATRIKS SHEETS
         function fetchBackendData() {
-            // Mencegah browser melakukan cache URL dengan parameter timestamp
-            const cacheBuster = new Date().getTime();
-            
-            fetch(API_URL + "?action=read&t=" + cacheBuster)
-                .then(response => {
-                    if (!response.ok) throw new Error("Jaringan bermasalah.");
-                    return response.json();
-                })
+            const buster = new Date().getTime();
+            fetch(API_URL + "?action=read&v=" + buster)
+                .then(response => response.json())
                 .then(res => {
                     if(res.status === "success") {
-                        // Memetakan data murni berdasarkan urutan kolom (A, B, C...) bukan nama header mutlak
+                        // Memetakan array objek secara dinamis berdasarkan posisi kolom absolut (A-J)
                         localDataStore = res.data.map(row => {
                             const keys = Object.keys(row);
                             return {
-                                id: row[keys[0]] || "-",          // Kolom A
-                                date: row[keys[1]] || "-",        // Kolom B
-                                customer: row[keys[2]] || "-",    // Kolom C
-                                po: row[keys[3]] || "-",          // Kolom D
-                                subject: row[keys[4]] || "-",     // Kolom E
-                                dept: row[keys[5]] || "-",        // Kolom F
-                                pic: row[keys[6]] || "-",         // Kolom G
-                                desc: row[keys[7]] || "-",        // Kolom H
-                                status: row[keys[8]] || "Open",   // Kolom I
-                                remarks: row[keys[9]] || "-"      // Kolom J
+                                id: row[keys[0]] || "-",       // A: ID
+                                date: row[keys[1]] || "-",     // B: DATE
+                                pic: row[keys[2]] || "-",      // C: PIC
+                                dept: row[keys[3]] || "-",     // D: DEPARTMENT
+                                customer: row[keys[4]] || "-", // E: CUSTOMER
+                                wos: row[keys[5]] || "-",      // F: WOS_NUMBER
+                                subject: row[keys[6]] || "-",  // G: SUBJECT
+                                desc: row[keys[7]] || "-",     // H: DESCRIPTION
+                                status: row[keys[8]] || "Open",// I: STATUS
+                                remarks: row[keys[9]] || "-"   // J: REMARKS
                             };
                         });
                         renderTables();
                         calculateMetrics();
-                    } else {
-                        console.error("Pesan Error Backend:", res.message);
                     }
                 })
                 .catch(err => {
-                    Swal.fire({ title: 'Data Kosong/Gagal Memuat', text: 'Periksa pengaturan deploy URL Anda.', icon: 'warning' });
+                    console.error("Gagal Render Tabel Dashboard:", err);
                 });
         }
 
@@ -331,15 +323,14 @@
             if ($.fn.DataTable.isDataTable('#previewTable')) $('#previewTable').DataTable().destroy();
             if ($.fn.DataTable.isDataTable('#masterTable')) { $('#masterTable').DataTable().destroy(); $('#filterRow').empty(); }
 
-            // Penyesuaian key data sesuai hasil mapping terbaru
             dtPreview = $('#previewTable').DataTable({
                 data: localDataStore,
                 columns: [
                     { data: 'id', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
                     { data: 'date' },
-                    { data: 'customer' },
-                    { data: 'subject' },
+                    { data: 'pic' },
                     { data: 'dept' },
+                    { data: 'customer' },
                     { data: 'status', render: d => renderStatusBadge(d) },
                     { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row.id) }
                 ],
@@ -352,10 +343,11 @@
                 columns: [
                     { data: 'id', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
                     { data: 'date' },
-                    { data: 'customer' },
-                    { data: 'subject' },
-                    { data: 'dept' },
                     { data: 'pic' },
+                    { data: 'dept' },
+                    { data: 'customer' },
+                    { data: 'wos' },
+                    { data: 'subject' },
                     { data: 'status', render: d => renderStatusBadge(d) },
                     { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row.id) }
                 ],
@@ -405,7 +397,7 @@
             updateChartGraphics(filtered);
         }
 
-        // PERBAIKAN FATAL 2: PENGIRIMAN DATA MENGGUNAKAN FORM URLENCODED UNTUK BYPASS CORS GOOGLE 302 REDIRECT
+        // PENGIRIMAN DATA FORM MENGGUNAKAN URL-ENCODED (100% BEBAS BLOKIR CORS)
         function handleFormSubmit(e) {
             e.preventDefault();
             let selectedSubjects = [];
@@ -418,38 +410,36 @@
 
             Swal.fire({ title: 'Menyimpan...', text: 'Mengirim baris ke cloud database.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            // Mengonversi data ke format URLSearchParams agar aman melintas batas CORS
+            // Mengubah struktur parameter form agar dibaca mulus oleh e.parameter di GAS
             const payloadData = new URLSearchParams({
                 action: "create",
                 date: document.getElementById('dateInput').value,
                 pic: document.getElementById('picInput').value,
                 department: document.getElementById('deptInput').value,
                 customer: document.getElementById('customerInput').value,
-                po_number: document.getElementById('poInput').value,
+                po_number: document.getElementById('wosInput').value, // Sesuai kolom WOS_NUMBER
                 subject: selectedSubjects.join(", "),
                 description: document.getElementById('detailInput').value
             });
 
             fetch(API_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: payloadData.toString()
             })
             .then(response => response.json())
             .then(res => {
                 if(res.status === "success") {
-                    Swal.fire({ title: 'Berhasil!', text: 'Tersimpan dengan ID: ' + res.id, icon: 'success' });
+                    Swal.fire({ title: 'Berhasil!', text: 'Tersimpan ke Database dengan ID: ' + res.id, icon: 'success' });
                     clearForm(); 
                     fetchBackendData(); 
                     switchTab('dataTab');
                 } else {
-                    Swal.fire({ title: 'Gagal Menyimpan!', text: res.message, icon: 'error' });
+                    Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' });
                 }
             })
             .catch(err => {
-                Swal.fire({ title: 'Error Koneksi!', text: 'Data tidak dapat dibaca dari server, periksa jaringan.', icon: 'error' });
+                Swal.fire({ title: 'Error System', text: 'Gagal memproses feedback server Google.', icon: 'error' });
             });
         }
 
@@ -464,13 +454,9 @@
                     if(res.status === "success") {
                         Swal.close(); 
                         window.open(res.pdfUrl, '_blank');
-                    } else { 
-                        Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); 
-                    }
+                    } else { Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); }
                 })
-                .catch(err => {
-                    Swal.fire({ title: 'Error Koneksi!', text: 'Gagal membuat file PDF.', icon: 'error' });
-                });
+                .catch(err => { Swal.fire({ title: 'Error Koneksi!', text: 'Gagal mengunduh file PDF.', icon: 'error' }); });
         }
 
         function openStatusUpdateModal(id) {
@@ -502,13 +488,9 @@
                         if(res.status === "success") {
                             Swal.fire({ title: 'Berhasil!', text: 'Status database tersinkronisasi.', icon: 'success' });
                             fetchBackendData();
-                        } else {
-                            Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' });
-                        }
+                        } else { Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); }
                     })
-                    .catch(err => {
-                        Swal.fire({ title: 'Error Koneksi!', text: 'Gagal mengupdate status.', icon: 'error' });
-                    });
+                    .catch(err => { Swal.fire({ title: 'Error!', text: 'Gagal update status.', icon: 'error' }); });
                 }
             });
         }
