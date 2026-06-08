@@ -250,7 +250,7 @@
     </main>
 
     <script>
-        // TEMPELKAN URL DEPLOYMENT WEB APP ANDA DI BAWAH INI
+        // URL WEB APP APPS SCRIPT ANDA
         const API_URL = "https://script.google.com/macros/s/AKfycbyvSFkA1cGtELzxfQwvImva9AV7oXkuNp-rnhJtiIvmyhh0dK05Xzk5pcbdu3NmSecuig/exec"; 
         
         let localDataStore = [];
@@ -288,16 +288,22 @@
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
+        // PENGAMBILAN DATA (NATIVE FETCH GET)
         function fetchBackendData() {
-            $.get(API_URL + "?action=read", function(res) {
-                if(res.status === "success") {
-                    localDataStore = res.data;
-                    renderTables();
-                    calculateMetrics();
-                }
-            }).fail(function() {
-                console.log("Koneksi gagal. Mungkin API_URL belum diganti.");
-            });
+            fetch(API_URL + "?action=read")
+                .then(response => response.json())
+                .then(res => {
+                    if(res.status === "success") {
+                        localDataStore = res.data;
+                        renderTables();
+                        calculateMetrics();
+                    } else {
+                        console.error("Pesan Error Server:", res.message);
+                    }
+                })
+                .catch(err => {
+                    console.error("Gagal mengambil data dari Google Sheets:", err);
+                });
         }
 
         function renderTables() {
@@ -377,62 +383,68 @@
             updateChartGraphics(filtered);
         }
 
-        // PENGIRIMAN DATA FORM MENGGUNAKAN JQUERY POST STANDAR (Bypass CORS)
-function handleFormSubmit(e) {
-    e.preventDefault();
-    let selectedSubjects = [];
-    $('input[name="subjectIssue"]:checked').each(function() { selectedSubjects.push($(this).val()); });
+        // PENGIRIMAN DATA FORM (NATIVE FETCH POST TEXT/PLAIN BYPASS CORS)
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            let selectedSubjects = [];
+            $('input[name="subjectIssue"]:checked').each(function() { selectedSubjects.push($(this).val()); });
 
-    if(selectedSubjects.length === 0) {
-        Swal.fire('Gagal!', 'Pilih minimal satu subject.', 'error');
-        return;
-    }
-
-    const payload = {
-        action: "create",
-        date: $('#dateInput').val(),
-        pic: $('#picInput').val(),
-        department: $('#deptInput').val(),
-        customer: $('#customerInput').val(),
-        po_number: $('#poInput').val(),
-        subject: selectedSubjects.join(", "),
-        description: $('#detailInput').val()
-    };
-
-    Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-    $.ajax({
-        url: API_URL,
-        type: 'POST',
-        data: payload, // jQuery akan otomatis mengubah ini ke format form-urlencoded
-        dataType: 'json',
-        success: function(res) {
-            // Cek jika status sukses
-            if(res && res.status === "success") {
-                Swal.fire('Berhasil!', 'ID: ' + res.id, 'success');
-                clearForm(); fetchBackendData(); switchTab('dataTab');
-            } else {
-                Swal.fire('Backend Error', res.message || 'Respons tidak dikenal', 'error');
+            if(selectedSubjects.length === 0) {
+                Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu pilihan Subject Issue.', icon: 'error' });
+                return;
             }
-        },
-        error: function(xhr, status, error) {
-            console.log("Raw Response:", xhr.responseText);
-            Swal.fire('Gagal!', 'Server merespons: ' + error + '. Cek Console Browser (F12) untuk detail.', 'error');
+
+            const payload = {
+                action: "create",
+                date: document.getElementById('dateInput').value,
+                pic: document.getElementById('picInput').value,
+                department: document.getElementById('deptInput').value,
+                customer: document.getElementById('customerInput').value,
+                po_number: document.getElementById('poInput').value,
+                subject: selectedSubjects.join(", "),
+                description: document.getElementById('detailInput').value
+            };
+
+            Swal.fire({ title: 'Menyimpan...', text: 'Mengirim baris ke cloud database.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(res => {
+                if(res.status === "success") {
+                    Swal.fire({ title: 'Berhasil!', text: 'ID Terdaftar: ' + res.id, icon: 'success' });
+                    clearForm(); 
+                    fetchBackendData(); 
+                    switchTab('dataTab');
+                } else {
+                    Swal.fire({ title: 'Gagal Menyimpan!', text: res.message, icon: 'error' });
+                }
+            })
+            .catch(err => {
+                Swal.fire({ title: 'Error Koneksi!', text: 'Terjadi kegagalan komunikasi dengan server Google.', icon: 'error' });
+            });
         }
-    });
-}
 
         function clearForm() { document.getElementById('specialRequestForm').reset(); document.getElementById('dateInput').valueAsDate = new Date(); }
 
         function triggerPrintEngine(id) {
             Swal.fire({ title: 'Memproses Berkas...', text: 'Mempersiapkan PDF siap cetak.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            $.get(API_URL + "?action=print&id=" + id, function(res) {
-                if(res.status === "success") {
-                    Swal.close(); window.open(res.pdfUrl, '_blank');
-                } else { Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); }
-            }).fail(function() {
-                Swal.fire({ title: 'Error Koneksi!', text: 'Gagal membuat file PDF.', icon: 'error' });
-            });
+            
+            fetch(API_URL + "?action=print&id=" + id)
+                .then(response => response.json())
+                .then(res => {
+                    if(res.status === "success") {
+                        Swal.close(); 
+                        window.open(res.pdfUrl, '_blank');
+                    } else { 
+                        Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); 
+                    }
+                })
+                .catch(err => {
+                    Swal.fire({ title: 'Error Koneksi!', text: 'Gagal membuat file PDF.', icon: 'error' });
+                });
         }
 
         function openStatusUpdateModal(id) {
@@ -452,14 +464,20 @@ function handleFormSubmit(e) {
                 if(result.isConfirmed) {
                     Swal.fire({ title: 'Mengirim status...', didOpen: () => Swal.showLoading() });
                     
-                    $.post(API_URL, result.value, function(res) {
+                    fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(result.value)
+                    })
+                    .then(response => response.json())
+                    .then(res => {
                         if(res.status === "success") {
                             Swal.fire({ title: 'Berhasil!', text: 'Status database tersinkronisasi.', icon: 'success' });
                             fetchBackendData();
                         } else {
                             Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' });
                         }
-                    }, "json").fail(function() {
+                    })
+                    .catch(err => {
                         Swal.fire({ title: 'Error Koneksi!', text: 'Gagal mengupdate status.', icon: 'error' });
                     });
                 }
