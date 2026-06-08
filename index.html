@@ -17,14 +17,12 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f4f7fe; }
-        
         table.dataTable { width: 100% !important; margin-top: 1rem !important; border-collapse: collapse !important; }
         table.dataTable thead th { 
             border-bottom: 2px solid #10b981 !important; color: #047857; font-weight: 700; 
             text-transform: uppercase; font-size: 0.75rem; padding: 0.6rem 0.75rem !important; background-color: #ecfdf5; 
         }
         table.dataTable tbody td { border-bottom: 1px solid #f1f5f9 !important; padding: 0.5rem 0.75rem !important; color: #475569; vertical-align: middle; }
-        
         .filter-header input {
             width: 100%; padding: 0.4rem 0.6rem; font-size: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; outline: none; font-weight: normal; color: #475569;
         }
@@ -250,7 +248,6 @@
     </main>
 
     <script>
-        // URL WEB APP APPS SCRIPT ASLI ANDA
         const API_URL = "https://script.google.com/macros/s/AKfycbyJSscSenINZE-z-7QeARx5qcHpiogte_0D7bxEuVmNDwVS9aPLQJyNZnRQU2qrkpWXMQ/exec"; 
         
         let localDataStore = [];
@@ -267,7 +264,7 @@
             ['dashEnd', 'analyticEnd'].forEach(id => document.getElementById(id).value = formatString(lastDay));
             document.getElementById('dateInput').valueAsDate = date;
 
-            // Memaksa Dashboard tampil utama
+            // Kunci halaman Dashboard tampil utama
             switchTab('dataTab');
             
             initCharts();
@@ -287,27 +284,30 @@
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
-        // PEMBACAAN DATA SECARA REALTIME BERDASARKAN URUTAN INDEKS MATRIKS SHEETS
+        // AMBIL DATA REALTIME + WRAPPER AMAN TERHADAP HURUF BESAR/KECIL KOLOM GOOGLE SHEETS
         function fetchBackendData() {
             const buster = new Date().getTime();
             fetch(API_URL + "?action=read&v=" + buster)
                 .then(response => response.json())
                 .then(res => {
                     if(res.status === "success") {
-                        // Memetakan array objek secara dinamis berdasarkan posisi kolom absolut (A-J)
+                        // Fitur Normalisasi Otomatis (Case-Insensitive Wrapper)
                         localDataStore = res.data.map(row => {
-                            const keys = Object.keys(row);
+                            const normalized = {};
+                            for (let key in row) {
+                                normalized[key.toLowerCase().trim()] = row[key];
+                            }
                             return {
-                                id: row[keys[0]] || "-",       // A: ID
-                                date: row[keys[1]] || "-",     // B: DATE
-                                pic: row[keys[2]] || "-",      // C: PIC
-                                dept: row[keys[3]] || "-",     // D: DEPARTMENT
-                                customer: row[keys[4]] || "-", // E: CUSTOMER
-                                wos: row[keys[5]] || "-",      // F: WOS_NUMBER
-                                subject: row[keys[6]] || "-",  // G: SUBJECT
-                                desc: row[keys[7]] || "-",     // H: DESCRIPTION
-                                status: row[keys[8]] || "Open",// I: STATUS
-                                remarks: row[keys[9]] || "-"   // J: REMARKS
+                                id: normalized["id"] || "-",
+                                date: normalized["date"] || "-",
+                                pic: normalized["pic"] || "-",
+                                dept: normalized["department"] || normalized["dept"] || "-",
+                                customer: normalized["customer"] || "-",
+                                wos: normalized["wos_number"] || normalized["wos"] || "-",
+                                subject: normalized["subject"] || "-",
+                                desc: normalized["description"] || normalized["desc"] || "-",
+                                status: normalized["status"] || "Open",
+                                remarks: normalized["remarks"] || "-"
                             };
                         });
                         renderTables();
@@ -315,7 +315,7 @@
                     }
                 })
                 .catch(err => {
-                    console.error("Gagal Render Tabel Dashboard:", err);
+                    console.error("Gagal Render Dashboard:", err);
                 });
         }
 
@@ -397,7 +397,7 @@
             updateChartGraphics(filtered);
         }
 
-        // PENGIRIMAN DATA FORM MENGGUNAKAN URL-ENCODED (100% BEBAS BLOKIR CORS)
+        // SIMPAN DATA FORM (X-WWW-FORM-URLENCODED STANDAR BEBAS BLOKIR CORS)
         function handleFormSubmit(e) {
             e.preventDefault();
             let selectedSubjects = [];
@@ -410,14 +410,14 @@
 
             Swal.fire({ title: 'Menyimpan...', text: 'Mengirim baris ke cloud database.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            // Mengubah struktur parameter form agar dibaca mulus oleh e.parameter di GAS
+            // Pengiriman terarah mengunci wos_number sesuai kebutuhan kolom ke-6 database
             const payloadData = new URLSearchParams({
                 action: "create",
                 date: document.getElementById('dateInput').value,
                 pic: document.getElementById('picInput').value,
                 department: document.getElementById('deptInput').value,
                 customer: document.getElementById('customerInput').value,
-                po_number: document.getElementById('wosInput').value, // Sesuai kolom WOS_NUMBER
+                wos_number: document.getElementById('wosInput').value, 
                 subject: selectedSubjects.join(", "),
                 description: document.getElementById('detailInput').value
             });
@@ -435,11 +435,11 @@
                     fetchBackendData(); 
                     switchTab('dataTab');
                 } else {
-                    Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' });
+                    Swal.fire({ title: 'Gagal Menyimpan!', text: res.message, icon: 'error' });
                 }
             })
             .catch(err => {
-                Swal.fire({ title: 'Error System', text: 'Gagal memproses feedback server Google.', icon: 'error' });
+                Swal.fire({ title: 'Error Koneksi!', text: 'Gagal memproses feedback server Google.', icon: 'error' });
             });
         }
 
@@ -447,13 +447,11 @@
 
         function triggerPrintEngine(id) {
             Swal.fire({ title: 'Memproses Berkas...', text: 'Mempersiapkan PDF siap cetak.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
             fetch(API_URL + "?action=print&id=" + id)
                 .then(response => response.json())
                 .then(res => {
                     if(res.status === "success") {
-                        Swal.close(); 
-                        window.open(res.pdfUrl, '_blank');
+                        Swal.close(); window.open(res.pdfUrl, '_blank');
                     } else { Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); }
                 })
                 .catch(err => { Swal.fire({ title: 'Error Koneksi!', text: 'Gagal mengunduh file PDF.', icon: 'error' }); });
@@ -475,9 +473,7 @@
             }).then((result) => {
                 if(result.isConfirmed) {
                     Swal.fire({ title: 'Mengirim status...', didOpen: () => Swal.showLoading() });
-                    
                     const updateData = new URLSearchParams(result.value);
-
                     fetch(API_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
