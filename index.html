@@ -127,9 +127,9 @@
                             <tr>
                                 <th>ID Request</th>
                                 <th>Tanggal</th>
-                                <th>PIC Pengaju</th>
-                                <th>Department</th>
                                 <th>Customer</th>
+                                <th>PO/Process No</th>
+                                <th>Department</th>
                                 <th>Status Alur</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -157,7 +157,7 @@
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-box text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Identitas Pesanan / Produk</h4></div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div><label class="form-label">Customer Name</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="PT. / CV. Penerima"></div>
-                                <div><label class="form-label">WOS Number <span class="text-red-500">*</span></label><input type="text" required id="wosInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor WOS"></div>
+                                <div><label class="form-label">Process Order No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor Proses/PO"></div>
                             </div>
                         </div>
                         
@@ -200,7 +200,7 @@
                         <table id="masterTable" class="w-full text-left text-sm text-slate-600 whitespace-nowrap cell-border">
                             <thead>
                                 <tr class="filter-header" id="filterRow"></tr>
-                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>PIC Pengaju</th><th>Department</th><th>Customer</th><th>WOS Number</th><th>Subject</th><th>Status</th><th>Action</th></tr>
+                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>Customer</th><th>PO/Process No</th><th>Subject</th><th>Dept</th><th>PIC</th><th>Status</th><th>Action</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -252,14 +252,14 @@
     </main>
 
     <script>
+        // GANTI DENGAN URL WEB APP DEPLOYMENT TERBARU ANDA
         const API_URL = "https://script.google.com/macros/s/AKfycby_N_jfnIH_VGVcopgWLTwpMcxQgOfgdRam57TMsVDYhxVXcyvt8JFeLeUsjRXH7rTEjQ/exec"; 
         
         let localDataStore = [];
         let dtPreview, dtMaster;
         let chartYearlyObj, chartCustomerObj, chartSubjectObj;
-        let editingId = null; // Menahan ID saat proses koreksi/edit aktif
+        let editingId = null; 
 
-        // Modifikasi 1: Memaksa Dashboard Tampil Pertama Saat Web Dibuka
         $(document).ready(function() {
             const date = new Date();
             const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -275,7 +275,6 @@
             initCharts();
             fetchBackendData();
 
-            // Trigger visibilitas Textbox Other
             $('#checkOther').change(function() {
                 if(this.checked) {
                     $('#otherSubjectContainer').removeClass('hidden');
@@ -300,23 +299,29 @@
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
+        // PENGAMBILAN DATA DENGAN MAPPING BARU (SESUAI HEADER SHEET 'DATABASE')
         function fetchBackendData() {
             const buster = new Date().getTime();
-            fetch(API_URL + "?action=read&v=" + buster)
-                .then(response => response.json())
+            const readUrl = API_URL + "?action=read&v=" + buster;
+            
+            fetch(readUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error("Jaringan Google bermasalah.");
+                    return response.json();
+                })
                 .then(res => {
                     if(res.status === "success") {
                         localDataStore = res.data.map(row => {
                             const normalized = {};
                             for (let key in row) { normalized[key.toLowerCase().trim()] = row[key]; }
                             return {
-                                id: normalized["id"] || "-",
+                                id: normalized["id request"] || normalized["id"] || "-",
                                 date: normalized["date"] || "-",
-                                pic: normalized["pic"] || "-",
-                                dept: normalized["department"] || normalized["dept"] || "-",
                                 customer: normalized["customer"] || "-",
-                                wos: normalized["wos_number"] || normalized["wos"] || "-",
+                                po: normalized["process_order_no"] || normalized["process_order"] || "-",
                                 subject: normalized["subject"] || "-",
+                                dept: normalized["department"] || normalized["dept"] || "-",
+                                pic: normalized["pic"] || "-",
                                 desc: normalized["description"] || normalized["desc"] || "-",
                                 status: normalized["status"] || "Open",
                                 remarks: normalized["remarks"] || "-"
@@ -324,9 +329,14 @@
                         });
                         renderTables();
                         calculateMetrics();
+                    } else {
+                        Swal.fire('Error Backend', res.message, 'error');
                     }
                 })
-                .catch(err => console.error("Error muat database:", err));
+                .catch(err => {
+                    console.error("Gagal Render:", err);
+                    Swal.fire('Koneksi Gagal', 'Pastikan URL API_URL sudah benar dan sudah dideploy ulang (New Version).', 'warning');
+                });
         }
 
         function renderTables() {
@@ -338,9 +348,9 @@
                 columns: [
                     { data: 'id', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
                     { data: 'date' },
-                    { data: 'pic' },
-                    { data: 'dept' },
                     { data: 'customer' },
+                    { data: 'po' },
+                    { data: 'dept' },
                     { data: 'status', render: d => renderStatusBadge(d) },
                     { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row.id) }
                 ],
@@ -353,11 +363,11 @@
                 columns: [
                     { data: 'id', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
                     { data: 'date' },
-                    { data: 'pic' },
-                    { data: 'dept' },
                     { data: 'customer' },
-                    { data: 'wos' },
+                    { data: 'po' },
                     { data: 'subject' },
+                    { data: 'dept' },
+                    { data: 'pic' },
                     { data: 'status', render: d => renderStatusBadge(d) },
                     { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row.id) }
                 ],
@@ -385,7 +395,6 @@
             return status;
         }
 
-        // Modifikasi 2: Mengubah Tombol Aksi Menjadi Print & Edit Secara Eksklusif
         function renderActionButtons(id) {
             return `
                 <div class="flex justify-center space-x-3">
@@ -394,27 +403,23 @@
                 </div>`;
         }
 
-        // Modifikasi 2: Fungsi Menarik Data Lama ke dalam Form Input Request
         function openEditForm(id) {
             const record = localDataStore.find(item => item.id === id);
             if (!record) return;
 
-            editingId = id; // Mengunci status edit aktif
+            editingId = id; 
             
-            // Injeksi nilai ke form
             document.getElementById('dateInput').value = record.date;
             document.getElementById('picInput').value = record.pic;
             document.getElementById('deptInput').value = record.dept;
             document.getElementById('customerInput').value = record.customer;
-            document.getElementById('wosInput').value = record.wos;
+            document.getElementById('poInput').value = record.po; // Disinkronkan dengan input ID poInput
             document.getElementById('detailInput').value = record.desc;
 
-            // Bersihkan status checkbox lama
             $('input[name="subjectIssue"]').prop('checked', false);
             $('#otherSubjectContainer').addClass('hidden');
             $('#otherSubjectInput').removeAttr('required').val('');
 
-            // Parsing Subject Issue terdaftar
             if(record.subject && record.subject !== "-") {
                 const subList = record.subject.split(", ");
                 subList.forEach(sub => {
@@ -428,14 +433,12 @@
                 });
             }
 
-            // Ubah Visual Penanda Form Mode Koreksi
             document.getElementById('formHeaderTitle').innerText = "Koreksi / Edit Data Special Request (" + id + ")";
             document.getElementById('submitBtnForm').innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> Update di Database`;
 
             switchTab('formTab');
         }
 
-        // Modifikasi 4: Ambil Data Riil Database untuk Mengisi Tren Dinamis Tahunan
         function calculateMetrics() {
             const start = document.getElementById('dashStart').value;
             const end = document.getElementById('dashEnd').value;
@@ -447,13 +450,12 @@
             $('#cardWip').text(filtered.filter(i => i.status === "Approved").length);
             $('#cardCompleted').text(filtered.filter(i => i.status === "Completed").length);
 
-            // Olah rentang data riil untuk disalurkan ke Grafik Tren Tahunan (Jan-Des)
             let monthCounts = new Array(12).fill(0);
             localDataStore.forEach(row => {
                 if(row.date && row.date !== "-") {
                     const parts = row.date.split("-");
                     if(parts.length === 3) {
-                        const monthIndex = parseInt(parts[1], 10) - 1; // Konversi ke index bulan js 0-11
+                        const monthIndex = parseInt(parts[1], 10) - 1; 
                         if(monthIndex >= 0 && monthIndex <= 11) {
                             monthCounts[monthIndex]++;
                         }
@@ -466,7 +468,6 @@
             updateChartGraphics(filtered);
         }
 
-        // AKSI SIMPAN FORM (MENDUKUNG KEDUA MODE: CREATE NEW & UPDATE DATA BARIS)
         function handleFormSubmit(e) {
             e.preventDefault();
             let selectedSubjects = [];
@@ -488,6 +489,7 @@
             Swal.fire({ title: 'Memproses...', text: 'Menghubungi cloud database.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             const isEditMode = (editingId !== null);
+            // URLSearchParams diperbarui sesuai format key di App Script baru
             const payloadData = new URLSearchParams({
                 action: isEditMode ? "update" : "create",
                 id: isEditMode ? editingId : "",
@@ -495,7 +497,7 @@
                 pic: document.getElementById('picInput').value,
                 department: document.getElementById('deptInput').value,
                 customer: document.getElementById('customerInput').value,
-                wos_number: document.getElementById('wosInput').value,
+                process_order_no: document.getElementById('poInput').value, // <-- Ini yang krusial disamakan
                 subject: selectedSubjects.join(", "),
                 description: document.getElementById('detailInput').value
             });
@@ -508,7 +510,7 @@
             .then(response => response.json())
             .then(res => {
                 if(res.status === "success") {
-                    Swal.fire({ title: 'Berhasil!', text: isEditMode ? 'Data ID ' + res.id + ' diperbarui.' : 'Tersimpan dengan ID: ' + res.id, icon: 'success' });
+                    Swal.fire({ title: 'Berhasil!', text: isEditMode ? 'Data diperbarui.' : 'Tersimpan dengan ID: ' + res.id, icon: 'success' });
                     clearForm(); 
                     fetchBackendData(); 
                     switchTab('dataTab');
