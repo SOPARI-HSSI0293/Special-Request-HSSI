@@ -250,7 +250,7 @@
     </main>
 
     <script>
-        // URL WEB APP ANDA
+        // URL WEB APP APPS SCRIPT
         const API_URL = "https://script.google.com/macros/s/AKfycbyvSFkA1cGtELzxfQwvImva9AV7oXkuNp-rnhJtiIvmyhh0dK05Xzk5pcbdu3NmSecuig/exec"; 
         
         let localDataStore = [];
@@ -268,7 +268,7 @@
             ['dashEnd', 'analyticEnd'].forEach(id => document.getElementById(id).value = formatString(lastDay));
             document.getElementById('dateInput').valueAsDate = date;
 
-            // MEMAKSA HALAMAN DASHBOARD TERBUKA PERTAMA KALI
+            // Memaksa Dashboard tampil pertama
             switchTab('dataTab');
             
             initCharts();
@@ -288,21 +288,42 @@
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
-        // PENGAMBILAN DATA
+        // PERBAIKAN FATAL 1: PENGAMBILAN DATA & MAPPING INDEX-BASED KEBETULAN HEADER GOOGLE SHEET
         function fetchBackendData() {
-            fetch(API_URL + "?action=read")
-                .then(response => response.json())
+            // Mencegah browser melakukan cache URL dengan parameter timestamp
+            const cacheBuster = new Date().getTime();
+            
+            fetch(API_URL + "?action=read&t=" + cacheBuster)
+                .then(response => {
+                    if (!response.ok) throw new Error("Jaringan bermasalah.");
+                    return response.json();
+                })
                 .then(res => {
                     if(res.status === "success") {
-                        localDataStore = res.data;
+                        // Memetakan data murni berdasarkan urutan kolom (A, B, C...) bukan nama header mutlak
+                        localDataStore = res.data.map(row => {
+                            const keys = Object.keys(row);
+                            return {
+                                id: row[keys[0]] || "-",          // Kolom A
+                                date: row[keys[1]] || "-",        // Kolom B
+                                customer: row[keys[2]] || "-",    // Kolom C
+                                po: row[keys[3]] || "-",          // Kolom D
+                                subject: row[keys[4]] || "-",     // Kolom E
+                                dept: row[keys[5]] || "-",        // Kolom F
+                                pic: row[keys[6]] || "-",         // Kolom G
+                                desc: row[keys[7]] || "-",        // Kolom H
+                                status: row[keys[8]] || "Open",   // Kolom I
+                                remarks: row[keys[9]] || "-"      // Kolom J
+                            };
+                        });
                         renderTables();
                         calculateMetrics();
                     } else {
-                        console.error("Error Backend:", res.message);
+                        console.error("Pesan Error Backend:", res.message);
                     }
                 })
                 .catch(err => {
-                    console.error("Gagal mengambil data:", err);
+                    Swal.fire({ title: 'Data Kosong/Gagal Memuat', text: 'Periksa pengaturan deploy URL Anda.', icon: 'warning' });
                 });
         }
 
@@ -310,16 +331,17 @@
             if ($.fn.DataTable.isDataTable('#previewTable')) $('#previewTable').DataTable().destroy();
             if ($.fn.DataTable.isDataTable('#masterTable')) { $('#masterTable').DataTable().destroy(); $('#filterRow').empty(); }
 
+            // Penyesuaian key data sesuai hasil mapping terbaru
             dtPreview = $('#previewTable').DataTable({
                 data: localDataStore,
                 columns: [
-                    { data: 'ID Request', render: d => `<span class="font-bold text-slate-800">${d||'-'}</span>` },
-                    { data: 'DATE' },
-                    { data: 'CUSTOMER' },
-                    { data: 'SUBJECT' },
-                    { data: 'DEPARTMENT' },
-                    { data: 'STATUS', render: d => renderStatusBadge(d) },
-                    { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row['ID Request']) }
+                    { data: 'id', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
+                    { data: 'date' },
+                    { data: 'customer' },
+                    { data: 'subject' },
+                    { data: 'dept' },
+                    { data: 'status', render: d => renderStatusBadge(d) },
+                    { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row.id) }
                 ],
                 order: [[0, 'desc']],
                 paging: true, pageLength: 5, searching: false, info: false, lengthChange: false
@@ -328,14 +350,14 @@
             dtMaster = $('#masterTable').DataTable({
                 data: localDataStore,
                 columns: [
-                    { data: 'ID Request', render: d => `<span class="font-bold text-slate-800">${d||'-'}</span>` },
-                    { data: 'DATE' },
-                    { data: 'CUSTOMER' },
-                    { data: 'SUBJECT' },
-                    { data: 'DEPARTMENT' },
-                    { data: 'PIC' },
-                    { data: 'STATUS', render: d => renderStatusBadge(d) },
-                    { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row['ID Request']) }
+                    { data: 'id', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
+                    { data: 'date' },
+                    { data: 'customer' },
+                    { data: 'subject' },
+                    { data: 'dept' },
+                    { data: 'pic' },
+                    { data: 'status', render: d => renderStatusBadge(d) },
+                    { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row.id) }
                 ],
                 order: [[0, 'desc']],
                 dom: '<"flex flex-col sm:flex-row justify-between items-center mb-4"lf>rtip'
@@ -358,11 +380,10 @@
             if(status === "Approved") return `<span class="bg-orange-100 text-orange-700 text-xs px-2.5 py-1 rounded-full font-bold"><i class="fa-solid fa-industry mr-1"></i>WIP Prod</span>`;
             if(status === "Rejected") return `<span class="bg-red-100 text-red-700 text-xs px-2.5 py-1 rounded-full font-bold"><i class="fa-solid fa-circle-xmark mr-1"></i>Rejected</span>`;
             if(status === "Completed") return `<span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-bold"><i class="fa-solid fa-check-double mr-1"></i>Completed</span>`;
-            return status || "-";
+            return status;
         }
 
         function renderActionButtons(id) {
-            if(!id) return "-";
             return `
                 <div class="flex justify-center space-x-3">
                     <button onclick="triggerPrintEngine('${id}')" title="Print Otomatis" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>
@@ -374,17 +395,17 @@
             const start = document.getElementById('dashStart').value;
             const end = document.getElementById('dashEnd').value;
             
-            let filtered = localDataStore.filter(item => item.DATE >= start && item.DATE <= end);
+            let filtered = localDataStore.filter(item => item.date >= start && item.date <= end);
             
             $('#cardTotal').text(filtered.length);
-            $('#cardRejected').text(filtered.filter(i => i.STATUS === "Rejected").length);
-            $('#cardWip').text(filtered.filter(i => i.STATUS === "Approved").length);
-            $('#cardCompleted').text(filtered.filter(i => i.STATUS === "Completed").length);
+            $('#cardRejected').text(filtered.filter(i => i.status === "Rejected").length);
+            $('#cardWip').text(filtered.filter(i => i.status === "Approved").length);
+            $('#cardCompleted').text(filtered.filter(i => i.status === "Completed").length);
 
             updateChartGraphics(filtered);
         }
 
-        // PENGIRIMAN DATA FORM MENGGUNAKAN NATIVE URLSEARCHPARAMS (ANTI CORS)
+        // PERBAIKAN FATAL 2: PENGIRIMAN DATA MENGGUNAKAN FORM URLENCODED UNTUK BYPASS CORS GOOGLE 302 REDIRECT
         function handleFormSubmit(e) {
             e.preventDefault();
             let selectedSubjects = [];
@@ -395,27 +416,31 @@
                 return;
             }
 
-            // Membungkus data dalam objek URLSearchParams agar dibaca sebagai Form Data oleh Server
-            const formData = new URLSearchParams();
-            formData.append("action", "create");
-            formData.append("date", document.getElementById('dateInput').value);
-            formData.append("pic", document.getElementById('picInput').value);
-            formData.append("department", document.getElementById('deptInput').value);
-            formData.append("customer", document.getElementById('customerInput').value);
-            formData.append("po_number", document.getElementById('poInput').value);
-            formData.append("subject", selectedSubjects.join(", "));
-            formData.append("description", document.getElementById('detailInput').value);
-
             Swal.fire({ title: 'Menyimpan...', text: 'Mengirim baris ke cloud database.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            // Mengonversi data ke format URLSearchParams agar aman melintas batas CORS
+            const payloadData = new URLSearchParams({
+                action: "create",
+                date: document.getElementById('dateInput').value,
+                pic: document.getElementById('picInput').value,
+                department: document.getElementById('deptInput').value,
+                customer: document.getElementById('customerInput').value,
+                po_number: document.getElementById('poInput').value,
+                subject: selectedSubjects.join(", "),
+                description: document.getElementById('detailInput').value
+            });
 
             fetch(API_URL, {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: payloadData.toString()
             })
             .then(response => response.json())
             .then(res => {
                 if(res.status === "success") {
-                    Swal.fire({ title: 'Berhasil!', text: 'ID Terdaftar: ' + res.id, icon: 'success' });
+                    Swal.fire({ title: 'Berhasil!', text: 'Tersimpan dengan ID: ' + res.id, icon: 'success' });
                     clearForm(); 
                     fetchBackendData(); 
                     switchTab('dataTab');
@@ -424,7 +449,7 @@
                 }
             })
             .catch(err => {
-                Swal.fire({ title: 'Error Koneksi!', text: 'Terjadi kegagalan komunikasi dengan server Google.', icon: 'error' });
+                Swal.fire({ title: 'Error Koneksi!', text: 'Data tidak dapat dibaca dari server, periksa jaringan.', icon: 'error' });
             });
         }
 
@@ -460,21 +485,17 @@
                     <input type="text" id="swalRemarks" class="w-full p-2 border rounded-lg" placeholder="Masukkan catatan remarks analisa">
                 `,
                 showCancelButton: true, confirmButtonText: 'Update Status', confirmButtonColor: '#10b981',
-                preConfirm: () => {
-                    const fd = new URLSearchParams();
-                    fd.append("action", "updateStatus");
-                    fd.append("id", id);
-                    fd.append("status", document.getElementById('swalStatus').value);
-                    fd.append("remarks", document.getElementById('swalRemarks').value);
-                    return fd;
-                }
+                preConfirm: () => ({ action: "updateStatus", id: id, status: document.getElementById('swalStatus').value, remarks: document.getElementById('swalRemarks').value })
             }).then((result) => {
                 if(result.isConfirmed) {
                     Swal.fire({ title: 'Mengirim status...', didOpen: () => Swal.showLoading() });
                     
+                    const updateData = new URLSearchParams(result.value);
+
                     fetch(API_URL, {
                         method: 'POST',
-                        body: result.value
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: updateData.toString()
                     })
                     .then(response => response.json())
                     .then(res => {
@@ -510,9 +531,9 @@
         function updateChartGraphics(filteredData) {
             let custCounts = {}, subjCounts = {};
             filteredData.forEach(row => {
-                let c = row.CUSTOMER || 'Unknown';
+                let c = row.customer || 'Unknown';
                 custCounts[c] = (custCounts[c] || 0) + 1;
-                if(row.SUBJECT) row.SUBJECT.split(', ').forEach(s => subjCounts[s] = (subjCounts[s] || 0) + 1);
+                if(row.subject) row.subject.split(', ').forEach(s => subjCounts[s] = (subjCounts[s] || 0) + 1);
             });
             chartCustomerObj.data.labels = Object.keys(custCounts);
             chartCustomerObj.data.datasets[0].data = Object.values(custCounts);
