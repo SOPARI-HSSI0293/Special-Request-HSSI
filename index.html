@@ -155,9 +155,15 @@
                         
                         <div class="mb-8">
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-box text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Identitas Pesanan / Produk</h4></div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
                                 <div><label class="form-label">Customer Name</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="PT. / CV. Penerima"></div>
                                 <div><label class="form-label">Process Order No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor Proses/PO"></div>
+                                <div><label class="form-label">CC No</label><input type="text" id="ccInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nomor CC"></div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div><label class="form-label">Spec</label><input type="text" id="specInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Spesifikasi Produk"></div>
+                                <div><label class="form-label">Size</label><input type="text" id="sizeInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Ukuran / Dimensi"></div>
                             </div>
                         </div>
                         
@@ -200,7 +206,7 @@
                         <table id="masterTable" class="w-full text-left text-sm text-slate-600 whitespace-nowrap cell-border">
                             <thead>
                                 <tr class="filter-header" id="filterRow"></tr>
-                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>Customer</th><th>PO/Process No</th><th>Subject</th><th>Dept</th><th>PIC</th><th>Status</th><th>Action</th></tr>
+                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>Customer</th><th>Spec</th><th>Size</th><th>CC No</th><th>PO/Process No</th><th>Subject</th><th>Dept</th><th>PIC</th><th>Status</th><th>Action</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -252,7 +258,7 @@
     </main>
 
     <script>
-        // PASTIKAN URL INI BENAR (URL Web App Deployment Terakhir Anda)
+        // GANTI DENGAN URL WEB APP DEPLOYMENT TERBARU ANDA
         const API_URL = "https://script.google.com/macros/s/AKfycby_N_jfnIH_VGVcopgWLTwpMcxQgOfgdRam57TMsVDYhxVXcyvt8JFeLeUsjRXH7rTEjQ/exec"; 
         
         let localDataStore = [];
@@ -299,6 +305,7 @@
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
+        // PENGAMBILAN DATA DENGAN MAPPING BARU (TERMASUK SPEC, SIZE, CC NO)
         function fetchBackendData() {
             const buster = new Date().getTime();
             const readUrl = API_URL + "?action=read&v=" + buster;
@@ -317,6 +324,9 @@
                                 id: normalized["id request"] || normalized["id"] || "-",
                                 date: normalized["date"] || "-",
                                 customer: normalized["customer"] || "-",
+                                spec: normalized["spec"] || "-",
+                                size: normalized["size"] || "-",
+                                cc_no: normalized["cc no"] || normalized["cc_no"] || "-",
                                 po: normalized["process_order_no"] || normalized["process_order"] || "-",
                                 subject: normalized["subject"] || "-",
                                 dept: normalized["department"] || normalized["dept"] || "-",
@@ -334,7 +344,7 @@
                 })
                 .catch(err => {
                     console.error("Gagal Render:", err);
-                    Swal.fire('Koneksi Gagal', 'Pastikan URL API_URL sudah benar dan sudah dideploy ulang (New Version).', 'warning');
+                    Swal.fire('Koneksi Gagal', 'Pastikan URL API_URL sudah benar dan dideploy ulang.', 'warning');
                 });
         }
 
@@ -357,12 +367,16 @@
                 paging: true, pageLength: 5, searching: false, info: false, lengthChange: false
             });
 
+            // Tabel Master sekarang menampilkan 12 kolom penuh
             dtMaster = $('#masterTable').DataTable({
                 data: localDataStore,
                 columns: [
                     { data: 'id', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
                     { data: 'date' },
                     { data: 'customer' },
+                    { data: 'spec' },
+                    { data: 'size' },
+                    { data: 'cc_no' },
                     { data: 'po' },
                     { data: 'subject' },
                     { data: 'dept' },
@@ -371,7 +385,8 @@
                     { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row.id) }
                 ],
                 order: [[0, 'desc']],
-                dom: '<"flex flex-col sm:flex-row justify-between items-center mb-4"lf>rtip'
+                dom: '<"flex flex-col sm:flex-row justify-between items-center mb-4"lf>rtip',
+                scrollX: true // Diaktifkan agar tabel tidak terlalu padat di layar kecil
             });
 
             $('#headerRow th').each(function (i) {
@@ -394,7 +409,6 @@
             return status;
         }
 
-        // --- INI ADALAH BAGIAN YANG DITAMBAHKAN ICON STEMPEL ---
         function renderActionButtons(id) {
             return `
                 <div class="flex justify-center space-x-3">
@@ -410,10 +424,14 @@
 
             editingId = id; 
             
+            // Mengisi form dengan data baru yang lengkap
             document.getElementById('dateInput').value = record.date;
             document.getElementById('picInput').value = record.pic;
             document.getElementById('deptInput').value = record.dept;
             document.getElementById('customerInput').value = record.customer;
+            document.getElementById('specInput').value = record.spec !== "-" ? record.spec : "";
+            document.getElementById('sizeInput').value = record.size !== "-" ? record.size : "";
+            document.getElementById('ccInput').value = record.cc_no !== "-" ? record.cc_no : "";
             document.getElementById('poInput').value = record.po; 
             document.getElementById('detailInput').value = record.desc;
 
@@ -440,7 +458,6 @@
             switchTab('formTab');
         }
 
-        // --- INI ADALAH FUNGSI MODAL POPUP UNTUK UPDATE STATUS YANG DITAMBAHKAN KEMBALI ---
         function openStatusUpdateModal(id) {
             Swal.fire({
                 title: 'Stempel Status Konfirmasi',
@@ -515,6 +532,7 @@
             updateChartGraphics(filtered);
         }
 
+        // PERUBAHAN PENGIRIMAN DATA FORM UNTUK MEMASUKKAN SPEC, SIZE & CC NO
         function handleFormSubmit(e) {
             e.preventDefault();
             let selectedSubjects = [];
@@ -543,6 +561,9 @@
                 pic: document.getElementById('picInput').value,
                 department: document.getElementById('deptInput').value,
                 customer: document.getElementById('customerInput').value,
+                spec: document.getElementById('specInput').value,
+                size: document.getElementById('sizeInput').value,
+                cc_no: document.getElementById('ccInput').value,
                 process_order_no: document.getElementById('poInput').value, 
                 subject: selectedSubjects.join(", "),
                 description: document.getElementById('detailInput').value
