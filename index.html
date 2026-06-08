@@ -17,14 +17,12 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f4f7fe; }
-        
         table.dataTable { width: 100% !important; margin-top: 1rem !important; border-collapse: collapse !important; }
         table.dataTable thead th { 
             border-bottom: 2px solid #10b981 !important; color: #047857; font-weight: 700; 
             text-transform: uppercase; font-size: 0.75rem; padding: 0.6rem 0.75rem !important; background-color: #ecfdf5; 
         }
         table.dataTable tbody td { border-bottom: 1px solid #f1f5f9 !important; padding: 0.5rem 0.75rem !important; color: #475569; vertical-align: middle; }
-        
         .filter-header input {
             width: 100%; padding: 0.4rem 0.6rem; font-size: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; outline: none; font-weight: normal; color: #475569;
         }
@@ -69,7 +67,7 @@
             </a>
         </nav>
         <div class="p-4 text-[10px] text-slate-400 text-center border-t border-slate-100 sidebar-text">
-            Version 2.0 &copy; 2026 Internal Automation
+            &copy; 2026 Internal Automation
         </div>
     </aside>
 
@@ -93,7 +91,7 @@
                         <input type="date" id="dashStart" class="px-2 py-1 bg-transparent text-sm font-medium text-[#0a4f4f] border-none outline-none">
                         <span class="text-[#187a7a]">-</span>
                         <input type="date" id="dashEnd" class="px-2 py-1 bg-transparent text-sm font-medium text-[#0a4f4f] border-none outline-none">
-                        <button onclick="refreshData()" class="bg-[#0a4f4f] text-white px-5 py-1.5 rounded-md hover:bg-[#073d3d] text-sm font-bold shadow-sm">Filter</button>
+                        <button onclick="calculateMetrics()" class="bg-[#0a4f4f] text-white px-5 py-1.5 rounded-md hover:bg-[#073d3d] text-sm font-bold shadow-sm">Filter</button>
                     </div>
                 </div>
 
@@ -129,9 +127,9 @@
                             <tr>
                                 <th>ID Request</th>
                                 <th>Tanggal</th>
-                                <th>Customer</th>
-                                <th>Subject Issue</th>
+                                <th>PIC Pengaju</th>
                                 <th>Department</th>
+                                <th>Customer</th>
                                 <th>Status Alur</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -143,14 +141,14 @@
 
             <div id="formTab" class="view-section hidden max-w-5xl mx-auto block">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="bg-white border-b border-slate-100 px-8 py-5"><h3 class="text-xl font-bold text-slate-800">Form Special Request Baru</h3><p class="text-sm text-slate-500 mt-1">Mengirim data mentah langsung menuju database pusat terpadu.</p></div>
+                    <div class="bg-white border-b border-slate-100 px-8 py-5"><h3 class="text-xl font-bold text-slate-800" id="formHeaderTitle">Form Special Request Baru</h3><p class="text-sm text-slate-500 mt-1">Mengirim data mentah langsung menuju database pusat terpadu.</p></div>
                     <form id="specialRequestForm" class="p-8" onsubmit="handleFormSubmit(event)">
                         
                         <div class="mb-8">
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-circle-user text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Informasi Pemohon</h4></div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div><label class="form-label">Tanggal <span class="text-red-500">*</span></label><input type="date" required id="dateInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
-                                <div><label class="form-label">PIC Request <span class="text-red-500">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nama Sales Inside"></div>
+                                <div><label class="form-label">PIC Request <span class="text-red-500">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nama Lengkap"></div>
                                 <div><label class="form-label">Departemen Pengaju <span class="text-red-500">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="Quality Control">Quality Control</option></select></div>
                             </div>
                         </div>
@@ -159,7 +157,7 @@
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-box text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Identitas Pesanan / Produk</h4></div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div><label class="form-label">Customer Name</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="PT. / CV. Penerima"></div>
-                                <div><label class="form-label">Process Order (PO) No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor PO Unik"></div>
+                                <div><label class="form-label">WOS Number <span class="text-red-500">*</span></label><input type="text" required id="wosInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor WOS"></div>
                             </div>
                         </div>
                         
@@ -176,6 +174,10 @@
                                         <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Trial material" class="w-4 h-4 text-emerald-600 rounded"><span>Trial material</span></label>
                                         <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Trial Proses" class="w-4 h-4 text-emerald-600 rounded"><span>Trial Proses</span></label>
                                         <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Out of Standart" class="w-4 h-4 text-emerald-600 rounded"><span>Out of Standart</span></label>
+                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Other" id="checkOther" class="w-4 h-4 text-emerald-600 rounded"><span>Other</span></label>
+                                    </div>
+                                    <div id="otherSubjectContainer" class="hidden mt-3">
+                                        <input type="text" id="otherSubjectInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject Issue kustom di sini...">
                                     </div>
                                 </div>
                                 <div><label class="form-label">Deskripsi Lengkap Request <span class="text-red-500">*</span></label><textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 resize-none" placeholder="Tulis instruksi khusus yang diajukan secara mendetail..."></textarea></div>
@@ -183,7 +185,7 @@
                         </div>
                         <div class="flex justify-end gap-3 pt-4">
                             <button type="button" onclick="clearForm()" class="px-6 py-2.5 text-slate-500 bg-slate-100 rounded-lg">Reset</button>
-                            <button type="submit" class="px-6 py-2.5 text-white bg-emerald-600 rounded-lg shadow-md font-semibold"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan ke Database</button>
+                            <button type="submit" id="submitBtnForm" class="px-6 py-2.5 text-white bg-emerald-600 rounded-lg shadow-md font-semibold"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan ke Database</button>
                         </div>
                     </form>
                 </div>
@@ -198,7 +200,7 @@
                         <table id="masterTable" class="w-full text-left text-sm text-slate-600 whitespace-nowrap cell-border">
                             <thead>
                                 <tr class="filter-header" id="filterRow"></tr>
-                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>Customer</th><th>Subject Issue</th><th>Department</th><th>PIC Pengaju</th><th>Status</th><th>Action</th></tr>
+                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>PIC Pengaju</th><th>Department</th><th>Customer</th><th>WOS Number</th><th>Subject</th><th>Status</th><th>Action</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -217,7 +219,7 @@
                         <input type="date" id="analyticStart" class="px-2 py-1.5 bg-transparent text-sm font-medium border-none outline-none">
                         <span class="text-slate-400 font-bold">-</span>
                         <input type="date" id="analyticEnd" class="px-2 py-1.5 bg-transparent text-sm font-medium border-none outline-none">
-                        <button onclick="refreshData()" class="bg-emerald-600 text-white px-6 py-1.5 rounded-md text-sm font-bold shadow-sm">Update Grafik</button>
+                        <button onclick="calculateMetrics()" class="bg-emerald-600 text-white px-6 py-1.5 rounded-md text-sm font-bold shadow-sm">Update Grafik</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -241,7 +243,7 @@
                     <div class="p-6 space-y-4 text-sm text-slate-600 leading-relaxed">
                         <p>1. <strong>Tim Sales Inside</strong> menginput data form baru melalui tab input. Saat disimpan, status otomatis bernilai <strong>Open (Menunggu Fisik)</strong>.</p>
                         <p>2. Sales menekan ikon <strong>Print</strong> pada tabel. Sistem GAS akan otomatis menyalin <code>Template_Cetak</code>, mengonversi ke PDF, memicu jendela cetak printer, dan menghapus kembali sheet salinan.</p>
-                        <p>3. Kertas dibawa berkeliling untuk approval fisik. Setelah lembar kertas masuk ke <strong>PPC / QC</strong>, petugas departemen membuka data master aplikasi ini dan mengeklik ikon <strong>Stempel Status</strong> untuk memperbarui status kertas (Approved / Rejected) di database terpusat.</p>
+                        <p>3. Kertas dibawa berkeliling untuk approval fisik. Setelah lembar kertas masuk ke <strong>PPC / QC</strong>, petugas departemen mengeklik tombol <strong>Edit</strong> untuk memperbarui data / remarks jika terjadi deviasi di lapangan.</p>
                     </div>
                 </div>
             </div>
@@ -250,15 +252,15 @@
     </main>
 
     <script>
-        // MASUKKAN API URL WEB APP APPS SCRIPT ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycbxGypVeBEISYnx_0WrMvDvwhGZETzv_hyORfEkp-tAQc6Eqth4_VTpM78kNDZjkKNH5QA/exec"; 
         
         let localDataStore = [];
         let dtPreview, dtMaster;
         let chartYearlyObj, chartCustomerObj, chartSubjectObj;
+        let editingId = null; // Menahan ID saat proses koreksi/edit aktif
 
+        // Modifikasi 1: Memaksa Dashboard Tampil Pertama Saat Web Dibuka
         $(document).ready(function() {
-            // Set running month dates
             const date = new Date();
             const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
             const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
@@ -268,17 +270,30 @@
             ['dashEnd', 'analyticEnd'].forEach(id => document.getElementById(id).value = formatString(lastDay));
             document.getElementById('dateInput').valueAsDate = date;
 
+            switchTab('dataTab');
+            
             initCharts();
             fetchBackendData();
+
+            // Trigger visibilitas Textbox Other
+            $('#checkOther').change(function() {
+                if(this.checked) {
+                    $('#otherSubjectContainer').removeClass('hidden');
+                    $('#otherSubjectInput').attr('required', true).focus();
+                } else {
+                    $('#otherSubjectContainer').addClass('hidden');
+                    $('#otherSubjectInput').removeAttr('required').val('');
+                }
+            });
         });
 
-        // Current time clock
         setInterval(() => { document.getElementById('currentTime').innerText = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }); }, 1000);
 
         function toggleSidebar() { $('#sidebar').toggleClass('w-64 w-20'); $('.sidebar-text').toggleClass('hidden'); }
 
         function switchTab(tabId) {
-            $('.view-section').addClass('hidden'); $('#' + tabId).removeClass('hidden');
+            $('.view-section').addClass('hidden'); 
+            $('#' + tabId).removeClass('hidden');
             $('.nav-btn').removeClass('bg-emerald-600 text-white shadow-md').addClass('text-slate-500');
             $('#nav-' + tabId).addClass('bg-emerald-600 text-white shadow-md').removeClass('text-slate-500');
             $('#pageTitle').text($('#nav-' + tabId + ' span').text());
@@ -286,25 +301,32 @@
         }
 
         function fetchBackendData() {
-            if(API_URL.includes("MOCK_API_KEY")) {
-                localDataStore = [
-                    { "ID Request": "SR-260601-01", "DATE": "2026-06-01", "CUSTOMER": "PT. Astra", "PROCESS_ORDER_NO": "PO-100", "SUBJECT": "Material Substitution, Sample", "DEPARTMENT": "Sales", "PIC": "Dewi K", "STATUS": "Open", "REMARKS": "-" },
-                    { "ID Request": "SR-260603-01", "DATE": "2026-06-03", "CUSTOMER": "PT. Toyota Motor", "PROCESS_ORDER_NO": "PO-105", "SUBJECT": "Urgent Proses", "DEPARTMENT": "Sales", "PIC": "Rian H", "STATUS": "Approved", "REMARKS": "Forwarded to Line 2" },
-                    { "ID Request": "SR-260605-01", "DATE": "2026-06-05", "CUSTOMER": "CV. Bahagia", "PROCESS_ORDER_NO": "PO-110", "SUBJECT": "Out of Standart", "DEPARTMENT": "Sales", "PIC": "Dewi K", "STATUS": "Rejected", "REMARKS": "Spec Not Match" },
-                    { "ID Request": "SR-260607-01", "DATE": "2026-06-07", "CUSTOMER": "PT. Hanwa Indonesia", "PROCESS_ORDER_NO": "PO-200", "SUBJECT": "Trial Machine, Trial Proses", "DEPARTMENT": "Sales", "PIC": "Budi T", "STATUS": "Completed", "REMARKS": "Trial sukses hasil OK" }
-                ];
-                renderTables();
-                calculateMetrics();
-                return;
-            }
-
-            $.get(API_URL + "?action=read", function(res) {
-                if(res.status === "success") {
-                    localDataStore = res.data;
-                    renderTables();
-                    calculateMetrics();
-                }
-            });
+            const buster = new Date().getTime();
+            fetch(API_URL + "?action=read&v=" + buster)
+                .then(response => response.json())
+                .then(res => {
+                    if(res.status === "success") {
+                        localDataStore = res.data.map(row => {
+                            const normalized = {};
+                            for (let key in row) { normalized[key.toLowerCase().trim()] = row[key]; }
+                            return {
+                                id: normalized["id"] || "-",
+                                date: normalized["date"] || "-",
+                                pic: normalized["pic"] || "-",
+                                dept: normalized["department"] || normalized["dept"] || "-",
+                                customer: normalized["customer"] || "-",
+                                wos: normalized["wos_number"] || normalized["wos"] || "-",
+                                subject: normalized["subject"] || "-",
+                                desc: normalized["description"] || normalized["desc"] || "-",
+                                status: normalized["status"] || "Open",
+                                remarks: normalized["remarks"] || "-"
+                            };
+                        });
+                        renderTables();
+                        calculateMetrics();
+                    }
+                })
+                .catch(err => console.error("Error muat database:", err));
         }
 
         function renderTables() {
@@ -314,13 +336,13 @@
             dtPreview = $('#previewTable').DataTable({
                 data: localDataStore,
                 columns: [
-                    { data: 'ID Request', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
-                    { data: 'DATE' },
-                    { data: 'CUSTOMER' },
-                    { data: 'SUBJECT' },
-                    { data: 'DEPARTMENT' },
-                    { data: 'STATUS', render: d => renderStatusBadge(d) },
-                    { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row['ID Request']) }
+                    { data: 'id', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
+                    { data: 'date' },
+                    { data: 'pic' },
+                    { data: 'dept' },
+                    { data: 'customer' },
+                    { data: 'status', render: d => renderStatusBadge(d) },
+                    { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row.id) }
                 ],
                 order: [[0, 'desc']],
                 paging: true, pageLength: 5, searching: false, info: false, lengthChange: false
@@ -329,14 +351,15 @@
             dtMaster = $('#masterTable').DataTable({
                 data: localDataStore,
                 columns: [
-                    { data: 'ID Request', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
-                    { data: 'DATE' },
-                    { data: 'CUSTOMER' },
-                    { data: 'SUBJECT' },
-                    { data: 'DEPARTMENT' },
-                    { data: 'PIC' },
-                    { data: 'STATUS', render: d => renderStatusBadge(d) },
-                    { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row['ID Request']) }
+                    { data: 'id', render: d => `<span class="font-bold text-slate-800">${d}</span>` },
+                    { data: 'date' },
+                    { data: 'pic' },
+                    { data: 'dept' },
+                    { data: 'customer' },
+                    { data: 'wos' },
+                    { data: 'subject' },
+                    { data: 'status', render: d => renderStatusBadge(d) },
+                    { data: null, orderable: false, className: "text-center", render: (data, type, row) => renderActionButtons(row.id) }
                 ],
                 order: [[0, 'desc']],
                 dom: '<"flex flex-col sm:flex-row justify-between items-center mb-4"lf>rtip'
@@ -362,123 +385,165 @@
             return status;
         }
 
+        // Modifikasi 2: Mengubah Tombol Aksi Menjadi Print & Edit Secara Eksklusif
         function renderActionButtons(id) {
             return `
                 <div class="flex justify-center space-x-3">
-                    <button onclick="triggerPrintEngine('${id}')" title="Print Otomatis via GAS" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>
-                    <button onclick="openStatusUpdateModal('${id}')" title="Update Status Alur (PPC/QC/Prod)" class="text-slate-400 hover:text-purple-600 text-base"><i class="fa-solid fa-stamp"></i></button>
+                    <button onclick="triggerPrintEngine('${id}')" title="Print Otomatis" class="text-slate-400 hover:text-emerald-600 text-base"><i class="fa-solid fa-print"></i></button>
+                    <button onclick="openEditForm('${id}')" title="Edit Request" class="text-slate-400 hover:text-blue-600 text-base"><i class="fa-solid fa-pen-to-square"></i></button>
                 </div>`;
         }
 
+        // Modifikasi 2: Fungsi Menarik Data Lama ke dalam Form Input Request
+        function openEditForm(id) {
+            const record = localDataStore.find(item => item.id === id);
+            if (!record) return;
+
+            editingId = id; // Mengunci status edit aktif
+            
+            // Injeksi nilai ke form
+            document.getElementById('dateInput').value = record.date;
+            document.getElementById('picInput').value = record.pic;
+            document.getElementById('deptInput').value = record.dept;
+            document.getElementById('customerInput').value = record.customer;
+            document.getElementById('wosInput').value = record.wos;
+            document.getElementById('detailInput').value = record.desc;
+
+            // Bersihkan status checkbox lama
+            $('input[name="subjectIssue"]').prop('checked', false);
+            $('#otherSubjectContainer').addClass('hidden');
+            $('#otherSubjectInput').removeAttr('required').val('');
+
+            // Parsing Subject Issue terdaftar
+            if(record.subject && record.subject !== "-") {
+                const subList = record.subject.split(", ");
+                subList.forEach(sub => {
+                    if(sub.startsWith("Other: ")) {
+                        $('#checkOther').prop('checked', true);
+                        $('#otherSubjectContainer').removeClass('hidden');
+                        $('#otherSubjectInput').attr('required', true).val(sub.replace("Other: ", ""));
+                    } else {
+                        $(`input[name="subjectIssue"][value="${sub}"]`).prop('checked', true);
+                    }
+                });
+            }
+
+            // Ubah Visual Penanda Form Mode Koreksi
+            document.getElementById('formHeaderTitle').innerText = "Koreksi / Edit Data Special Request (" + id + ")";
+            document.getElementById('submitBtnForm').innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> Update di Database`;
+
+            switchTab('formTab');
+        }
+
+        // Modifikasi 4: Ambil Data Riil Database untuk Mengisi Tren Dinamis Tahunan
         function calculateMetrics() {
             const start = document.getElementById('dashStart').value;
             const end = document.getElementById('dashEnd').value;
             
-            let filtered = localDataStore.filter(item => item.DATE >= start && item.DATE <= end);
+            let filtered = localDataStore.filter(item => item.date >= start && item.date <= end);
             
             $('#cardTotal').text(filtered.length);
-            $('#cardRejected').text(filtered.filter(i => i.STATUS === "Rejected").length);
-            $('#cardWip').text(filtered.filter(i => i.STATUS === "Approved").length);
-            $('#cardCompleted').text(filtered.filter(i => i.STATUS === "Completed").length);
+            $('#cardRejected').text(filtered.filter(i => i.status === "Rejected").length);
+            $('#cardWip').text(filtered.filter(i => i.status === "Approved").length);
+            $('#cardCompleted').text(filtered.filter(i => i.status === "Completed").length);
+
+            // Olah rentang data riil untuk disalurkan ke Grafik Tren Tahunan (Jan-Des)
+            let monthCounts = new Array(12).fill(0);
+            localDataStore.forEach(row => {
+                if(row.date && row.date !== "-") {
+                    const parts = row.date.split("-");
+                    if(parts.length === 3) {
+                        const monthIndex = parseInt(parts[1], 10) - 1; // Konversi ke index bulan js 0-11
+                        if(monthIndex >= 0 && monthIndex <= 11) {
+                            monthCounts[monthIndex]++;
+                        }
+                    }
+                }
+            });
+            chartYearlyObj.data.datasets[0].data = monthCounts;
+            chartYearlyObj.update();
 
             updateChartGraphics(filtered);
         }
 
-        function refreshData() {
-            fetchBackendData();
-            Swal.fire({ title: 'Data Diperbarui!', text: 'Metrik & grafik disesuaikan.', icon: 'success', timer: 1000, showConfirmButton: false });
-        }
-
+        // AKSI SIMPAN FORM (MENDUKUNG KEDUA MODE: CREATE NEW & UPDATE DATA BARIS)
         function handleFormSubmit(e) {
             e.preventDefault();
             let selectedSubjects = [];
-            $('input[name="subjectIssue"]:checked').each(function() { selectedSubjects.push($(this).val()); });
+            $('input[name="subjectIssue"]:checked').each(function() {
+                let val = $(this).val();
+                if(val === "Other") {
+                    let textVal = document.getElementById('otherSubjectInput').value.trim();
+                    if(textVal) selectedSubjects.push("Other: " + textVal);
+                } else {
+                    selectedSubjects.push(val);
+                }
+            });
 
             if(selectedSubjects.length === 0) {
-                Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu pilihan Subject Issue.', icon: 'error', confirmButtonColor: '#ef4444' });
+                Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu pilihan Subject Issue.', icon: 'error' });
                 return;
             }
 
-            const payload = {
-                action: "create",
+            Swal.fire({ title: 'Memproses...', text: 'Menghubungi cloud database.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const isEditMode = (editingId !== null);
+            const payloadData = new URLSearchParams({
+                action: isEditMode ? "update" : "create",
+                id: isEditMode ? editingId : "",
                 date: document.getElementById('dateInput').value,
                 pic: document.getElementById('picInput').value,
                 department: document.getElementById('deptInput').value,
                 customer: document.getElementById('customerInput').value,
-                po_number: document.getElementById('poInput').value,
+                wos_number: document.getElementById('wosInput').value,
                 subject: selectedSubjects.join(", "),
                 description: document.getElementById('detailInput').value
-            };
+            });
 
-            Swal.fire({ title: 'Menyimpan ke Database...', text: 'Mengirim baris menuju Google Sheets terpusat.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            if(API_URL.includes("MOCK_API_KEY")) {
-                setTimeout(() => {
-                    Swal.fire({ title: 'Sukses Terpaku!', text: 'Simpan simulasi berhasil. ID Baru di-generate otomatis oleh backend GAS.', icon: 'success' });
-                    clearForm(); fetchBackendData(); switchTab('dataTab');
-                }, 1000);
-                return;
-            }
-
-            $.post(API_URL, JSON.stringify(payload), function(res) {
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: payloadData.toString()
+            })
+            .then(response => response.json())
+            .then(res => {
                 if(res.status === "success") {
-                    Swal.fire({ title: 'Berhasil Disimpan!', text: 'Tercatat dengan ID unik: ' + res.id, icon: 'success', confirmButtonColor: '#10b981' });
-                    clearForm(); fetchBackendData(); switchTab('dataTab');
+                    Swal.fire({ title: 'Berhasil!', text: isEditMode ? 'Data ID ' + res.id + ' diperbarui.' : 'Tersimpan dengan ID: ' + res.id, icon: 'success' });
+                    clearForm(); 
+                    fetchBackendData(); 
+                    switchTab('dataTab');
+                } else {
+                    Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' });
                 }
-            }, "json");
+            })
+            .catch(err => Swal.fire({ title: 'Error!', text: 'Gagal memproses data server.', icon: 'error' }));
         }
 
-        function clearForm() { document.getElementById('specialRequestForm').reset(); document.getElementById('dateInput').valueAsDate = new Date(); }
+        function clearForm() {
+            document.getElementById('specialRequestForm').reset();
+            document.getElementById('dateInput').valueAsDate = new Date();
+            editingId = null;
+            $('#otherSubjectContainer').addClass('hidden');
+            $('#otherSubjectInput').removeAttr('required').val('');
+            document.getElementById('formHeaderTitle').innerText = "Form Special Request Baru";
+            document.getElementById('submitBtnForm').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Simpan ke Database`;
+        }
 
         function triggerPrintEngine(id) {
-            Swal.fire({ title: 'Menghubungi Server...', text: 'GAS sedang menduplikasi Template_Cetak & menyusun berkas PDF.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
-            if(API_URL.includes("MOCK_API_KEY")) {
-                setTimeout(() => Swal.fire({ title: 'Simulasi Cetak!', text: 'Di sistem asli, perintah ini membuka link direct PDF render dari Spreadsheet.', icon: 'info' }), 1200);
-                return;
-            }
-
-            $.get(API_URL + "?action=print&id=" + id, function(res) {
-                if(res.status === "success") {
-                    Swal.close(); window.open(res.pdfUrl, '_blank');
-                } else { Swal.fire({ title: 'Gagal Cetak!', text: res.message, icon: 'error' }); }
-            });
-        }
-
-        function openStatusUpdateModal(id) {
-            Swal.fire({
-                title: 'Stempel Status Konfirmasi',
-                html: `
-                    <p class="text-xs text-slate-500 mb-3">Update pergerakan dokumen fisik untuk ID: <b>${id}</b></p>
-                    <select id="swalStatus" class="w-full p-2 border rounded-lg mb-3 bg-white">
-                        <option value="Approved">Approved & Diteruskan ke Produksi</option>
-                        <option value="Rejected">Rejected / Dikembalikan ke Sales</option>
-                        <option value="Completed">Completed (Selesai Eksekusi Lapangan)</option>
-                    </select>
-                    <input type="text" id="swalRemarks" class="w-full p-2 border rounded-lg" placeholder="Masukkan catatan hasil analisis/remarks produksi">
-                `,
-                showCancelButton: true, confirmButtonText: 'Update Status', confirmButtonColor: '#10b981',
-                preConfirm: () => ({ action: "updateStatus", id: id, status: document.getElementById('swalStatus').value, remarks: document.getElementById('swalRemarks').value })
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    Swal.fire({ title: 'Memproses konfirmasi...', didOpen: () => Swal.showLoading() });
-                    if(API_URL.includes("MOCK_API_KEY")) {
-                        let row = localDataStore.find(i => i["ID Request"] === id);
-                        if(row) { row.STATUS = result.value.status; row.REMARKS = result.value.remarks; }
-                        Swal.fire({ title: 'Terupdate!', text: 'Simulasi status alur hybrid berhasil.', icon: 'success' });
-                        renderTables(); calculateMetrics(); return;
-                    }
-                    $.post(API_URL, JSON.stringify(result.value), function(res) {
-                        if(res.status === "success") { Swal.fire({ title: 'Berhasil!', text: 'Status dokumen fisik selaras dengan database.', icon: 'success' }); fetchBackendData(); }
-                    }, "json");
-                }
-            });
+            Swal.fire({ title: 'Memproses Berkas...', text: 'Mempersiapkan PDF siap cetak.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            fetch(API_URL + "?action=print&id=" + id)
+                .then(response => response.json())
+                .then(res => {
+                    if(res.status === "success") {
+                        Swal.close(); window.open(res.pdfUrl, '_blank');
+                    } else { Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); }
+                })
+                .catch(err => Swal.fire({ title: 'Error!', text: 'Gagal mengunduh berkas.', icon: 'error' }));
         }
 
         function initCharts() {
-            Chart.defaults.font.family = "'Inter', sans-serif";
             chartYearlyObj = new Chart(document.getElementById('chartYearly').getContext('2d'), {
-                type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets: [{ data: [15,22,18,34,25,40,0,0,0,0,0,0], borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.03)', fill:true, tension:0.3 }] },
+                type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets: [{ data: [0,0,0,0,0,0,0,0,0,0,0,0], borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.03)', fill:true, tension:0.3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
             chartCustomerObj = new Chart(document.getElementById('chartCustomer').getContext('2d'), {
@@ -494,9 +559,9 @@
         function updateChartGraphics(filteredData) {
             let custCounts = {}, subjCounts = {};
             filteredData.forEach(row => {
-                let c = row.CUSTOMER || 'Unknown';
+                let c = row.customer || 'Unknown';
                 custCounts[c] = (custCounts[c] || 0) + 1;
-                if(row.SUBJECT) row.SUBJECT.split(', ').forEach(s => subjCounts[s] = (subjCounts[s] || 0) + 1);
+                if(row.subject) row.subject.split(', ').forEach(s => subjCounts[s] = (subjCounts[s] || 0) + 1);
             });
             chartCustomerObj.data.labels = Object.keys(custCounts);
             chartCustomerObj.data.datasets[0].data = Object.values(custCounts);
