@@ -599,15 +599,60 @@
         }
 
         function triggerPrintEngine(id) {
-            Swal.fire({ title: 'Memproses Berkas...', text: 'Mempersiapkan PDF siap cetak.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            fetch(API_URL + "?action=print&id=" + id)
-                .then(response => response.json())
-                .then(res => {
-                    if(res.status === "success") {
-                        Swal.close(); window.open(res.pdfUrl, '_blank');
-                    } else { Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); }
-                })
-                .catch(err => Swal.fire({ title: 'Error!', text: 'Gagal mengunduh berkas.', icon: 'error' }));
+            const r = localDataStore.find(item => item.id === id);
+            if (!r) { Swal.fire('Error', 'Data tidak ditemukan.', 'error'); return; }
+
+            const row = (label, value) => `
+                <tr>
+                    <td style="padding:6px 10px;border:1px solid #94a3b8;background:#f1f5f9;font-weight:bold;width:30%;">${label}</td>
+                    <td style="padding:6px 10px;border:1px solid #94a3b8;width:70%;">${value || '-'}</td>
+                </tr>`;
+
+            const printHtml = `
+                <!DOCTYPE html><html><head><title>Special Request - ${r.id}</title>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 30px; color:#1e293b; }
+                    h2 { text-align:center; margin-bottom:2px; }
+                    p.sub { text-align:center; margin-top:0; color:#64748b; font-size:12px; margin-bottom:20px; }
+                    table { width:100%; border-collapse:collapse; margin-bottom:20px; }
+                    .sign-table td { border:none; text-align:center; padding-top:60px; font-size:12px; }
+                    .sign-table .line { border-top:1px solid #1e293b; margin:0 20px; padding-top:4px; }
+                </style>
+                </head><body>
+                    <h2>SPECIAL REQUEST FORM</h2>
+                    <p class="sub">ID: ${r.id} &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}</p>
+                    <table>
+                        ${row('Tanggal', r.date)}
+                        ${row('Customer', r.customer)}
+                        ${row('Spec', r.spec)}
+                        ${row('Size', r.size)}
+                        ${row('CC No', r.cc_no)}
+                        ${row('PO / Process No', r.po)}
+                        ${row('Subject', r.subject)}
+                        ${row('Department', r.dept)}
+                        ${row('PIC', r.pic)}
+                        ${row('Status', r.status)}
+                        ${row('Description', r.desc)}
+                        ${row('Remarks', r.remarks)}
+                    </table>
+                    <table class="sign-table">
+                        <tr>
+                            <td><div class="line">Sales Inside</div></td>
+                            <td><div class="line">PPC / Production</div></td>
+                            <td><div class="line">QC</div></td>
+                            <td><div class="line">Approval</div></td>
+                        </tr>
+                    </table>
+                    <script>
+                        window.onload = function() { window.print(); }
+                    <\/script>
+                </body></html>`;
+
+            const win = window.open('', '_blank');
+            win.document.open();
+            win.document.write(printHtml);
+            win.document.close();
         }
 
         function initCharts() {
