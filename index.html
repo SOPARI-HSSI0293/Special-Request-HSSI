@@ -598,134 +598,16 @@
             document.getElementById('submitBtnForm').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Simpan ke Database`;
         }
 
-        // --- FITUR PRINT INSTAN (CLIENT-SIDE) SUDAH TERPASANG DI SINI ---
         function triggerPrintEngine(id) {
-            // 1. Cari data di memori tabel (tidak hitung server sama sekali)
-            const record = localDataStore.find(item => item.id === id);
-            if (!record) {
-                Swal.fire({ title: 'Gagal!', text: 'Data tidak ditemukan di sistem.', icon: 'error' });
-                return;
-            }
-
-            // 2. Buka tab baru untuk wadah print
-            const printWindow = window.open('', '_blank');
-            
-            // 3. Rakit Desain HTML untuk Cetakan Kertas
-            const htmlContent = `
-            <!DOCTYPE html>
-            <html lang="id">
-            <head>
-                <meta charset="UTF-8">
-                <title>Print - ${record.id}</title>
-                <style>
-                    body { font-family: 'Arial', sans-serif; margin: 0; padding: 20px; color: #000; font-size: 12px; }
-                    .print-container { width: 100%; max-width: 800px; margin: 0 auto; border: 2px solid #000; padding: 20px; box-sizing: border-box; }
-                    .header { text-align: center; border-bottom: 3px double #000; padding-bottom: 15px; margin-bottom: 20px; }
-                    .header h1 { margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
-                    .header p { margin: 5px 0 0; font-size: 12px; font-weight: bold; color: #333; }
-                    
-                    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                    .info-table th, .info-table td { border: 1px solid #000; padding: 8px 10px; text-align: left; vertical-align: top; }
-                    .info-table th { width: 30%; background-color: #f4f4f4; text-transform: uppercase; font-size: 11px; }
-                    .info-table td { font-weight: bold; font-size: 13px; }
-
-                    .desc-box { border: 1px solid #000; padding: 0; margin-bottom: 20px; }
-                    .desc-title { background-color: #f4f4f4; border-bottom: 1px solid #000; padding: 8px 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-                    .desc-content { padding: 15px 10px; min-height: 100px; font-size: 13px; font-weight: normal; line-height: 1.5; white-space: pre-wrap; }
-
-                    .signature-area { display: flex; justify-content: space-between; margin-top: 30px; text-align: center; font-size: 12px; }
-                    .signature-box { width: 28%; }
-                    .signature-line { border-bottom: 1px solid #000; margin-top: 60px; margin-bottom: 5px; }
-                    
-                    @media print {
-                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                        @page { margin: 10mm; }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="print-container">
-                    <div class="header">
-                        <h1>Form Special Request</h1>
-                        <p>Dokumen Pengendalian Produksi & Kualitas</p>
-                    </div>
-
-                    <table class="info-table">
-                        <tr>
-                            <th>No. Document (ID)</th>
-                            <td colspan="3" style="font-size: 16px;">${record.id}</td>
-                        </tr>
-                        <tr>
-                            <th>Tanggal Request</th>
-                            <td>${record.date}</td>
-                            <th>Status Terkini</th>
-                            <td>${record.status}</td>
-                        </tr>
-                        <tr>
-                            <th>Departemen / PIC</th>
-                            <td colspan="3">${record.dept} &mdash; ${record.pic}</td>
-                        </tr>
-                        <tr>
-                            <th>Customer Name</th>
-                            <td colspan="3">${record.customer}</td>
-                        </tr>
-                        <tr>
-                            <th>Process Order / PO</th>
-                            <td>${record.po}</td>
-                            <th>CC No</th>
-                            <td>${record.cc_no}</td>
-                        </tr>
-                        <tr>
-                            <th>Specification (Spec)</th>
-                            <td>${record.spec}</td>
-                            <th>Size / Dimensi</th>
-                            <td>${record.size}</td>
-                        </tr>
-                        <tr>
-                            <th>Subject Issue</th>
-                            <td colspan="3" style="color: #d32f2f;">${record.subject}</td>
-                        </tr>
-                    </table>
-
-                    <div class="desc-box">
-                        <div class="desc-title">Detail Kondisi / Deskripsi Request :</div>
-                        <div class="desc-content">${record.desc}</div>
-                    </div>
-
-                    <div class="signature-area">
-                        <div class="signature-box">
-                            <div>Dibuat Oleh (Sales/Inside),</div>
-                            <div class="signature-line"></div>
-                            <div style="font-weight:bold;">${record.pic}</div>
-                        </div>
-                        <div class="signature-box">
-                            <div>Diperiksa Oleh (PPC/QC),</div>
-                            <div class="signature-line"></div>
-                            <div>Petugas Terkait</div>
-                        </div>
-                        <div class="signature-box">
-                            <div>Disetujui Oleh,</div>
-                            <div class="signature-line"></div>
-                            <div>Manajer / Dept. Head</div>
-                        </div>
-                    </div>
-                </div>
-
-                <script>
-                    // Memicu jendela cetak segera setelah form HTML terbuka
-                    window.onload = function() {
-                        setTimeout(function() {
-                            window.print();
-                        }, 200);
-                    };
-                </script>
-            </body>
-            </html>
-            `;
-
-            // 4. Masukkan kode ke tab dan jalankan
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
+            Swal.fire({ title: 'Memproses Berkas...', text: 'Mempersiapkan PDF siap cetak.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            fetch(API_URL + "?action=print&id=" + id)
+                .then(response => response.json())
+                .then(res => {
+                    if(res.status === "success") {
+                        Swal.close(); window.open(res.pdfUrl, '_blank');
+                    } else { Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' }); }
+                })
+                .catch(err => Swal.fire({ title: 'Error!', text: 'Gagal mengunduh berkas.', icon: 'error' }));
         }
 
         function initCharts() {
