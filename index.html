@@ -199,7 +199,7 @@
             <div id="tableTab" class="view-section hidden max-w-[98%] mx-auto block">
                 <div class="bg-white rounded-xl shadow-sm border border-emerald-100 overflow-hidden">
                     <div class="px-5 py-4 border-b border-emerald-100 flex justify-between items-center bg-emerald-50">
-                        <h3 class="text-lg font-bold text-emerald-800 tracking-tight"><i class="fa-solid fa-database mr-2"></i>Database Master Data (Urutan Terbaru Paling Atas)</h3>
+                        <h3 class="text-lg font-bold text-emerald-800 tracking-tight"><i class="fa-solid fa-database mr-2"></i>Database Master Data</h3>
                     </div>
                     <div class="p-6 overflow-x-auto w-full">
                         <table id="masterTable" class="w-full text-left text-sm text-slate-600 whitespace-nowrap cell-border">
@@ -246,9 +246,9 @@
                         <p class="text-slate-400 text-sm mt-1">Panduan sinkronisasi dokumen fisik dengan data sistem digital.</p>
                     </div>
                     <div class="p-6 space-y-4 text-sm text-slate-600 leading-relaxed">
-                        <p>1. <strong>Tim Sales Inside</strong> menginput data form baru melalui tab input. Saat disimpan, status otomatis bernilai <strong>Open (Menunggu Fisik)</strong>.</p>
-                        <p>2. Sales menekan ikon <strong>Print</strong> pada tabel. Sistem akan otomatis memunculkan pop-up cetak secara instan dengan desain yang sudah dirakit oleh browser.</p>
-                        <p>3. Kertas dibawa berkeliling untuk approval fisik. Setelah lembar kertas masuk ke <strong>PPC / QC</strong>, petugas mengeklik tombol <strong>Edit</strong> untuk memperbarui data, atau tombol <strong>Stempel</strong> untuk mengubah status proses akhir.</p>
+                        <p>1. <strong>Tim Sales Inside</strong> menginput form baru melalui tab input. Saat disimpan, status otomatis <strong>Open</strong>.</p>
+                        <p>2. Sales menekan ikon <strong>Print</strong> pada tabel Master. Sistem akan memunculkan pop-up formulir cetak tanpa jeda *loading*.</p>
+                        <p>3. Kertas dibawa keliling untuk persetujuan fisik (ISO form). Setelah masuk ke <strong>PPC/QC</strong>, petugas menekan tombol <strong>Edit</strong> untuk koreksi data, atau tombol <strong>Stempel</strong> untuk mengubah status produksi akhir.</p>
                     </div>
                 </div>
             </div>
@@ -257,7 +257,7 @@
     </main>
 
     <script>
-        // GANTI DENGAN URL WEB APP DEPLOYMENT TERBARU ANDA
+        // MASUKKAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycby_N_jfnIH_VGVcopgWLTwpMcxQgOfgdRam57TMsVDYhxVXcyvt8JFeLeUsjRXH7rTEjQ/exec"; 
         
         let localDataStore = [];
@@ -303,7 +303,7 @@
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
         }
 
-        // PENGAMBILAN DATA DENGAN MAPPING 13 KOLOM
+        // PENGAMBILAN DATA (13 KOLOM)
         function fetchBackendData() {
             const buster = new Date().getTime();
             const readUrl = API_URL + "?action=read&v=" + buster;
@@ -406,7 +406,6 @@
             return status;
         }
 
-        // --- TOMBOL AKSI LENGKAP (PRINT INSTAN, EDIT, STEMPEL) ---
         function renderActionButtons(id) {
             return `
                 <div class="flex justify-center space-x-3">
@@ -416,7 +415,6 @@
                 </div>`;
         }
 
-        // --- FITUR EDIT ---
         function openEditForm(id) {
             const record = localDataStore.find(item => item.id === id);
             if (!record) return;
@@ -456,7 +454,6 @@
             switchTab('formTab');
         }
 
-        // --- FITUR STEMPEL STATUS ---
         function openStatusUpdateModal(id) {
             Swal.fire({
                 title: 'Stempel Status Konfirmasi',
@@ -487,82 +484,92 @@
                     .then(response => response.json())
                     .then(res => {
                         if(res.status === "success") {
-                            Swal.fire({ title: 'Berhasil!', text: 'Status database tersinkronisasi.', icon: 'success' });
+                            Swal.fire({ title: 'Berhasil!', text: 'Status tersinkronisasi.', icon: 'success' });
                             fetchBackendData();
                         } else {
                             Swal.fire({ title: 'Gagal!', text: res.message, icon: 'error' });
                         }
                     })
-                    .catch(err => {
-                        Swal.fire({ title: 'Error Koneksi!', text: 'Gagal mengupdate status.', icon: 'error' });
-                    });
+                    .catch(err => Swal.fire({ title: 'Error Koneksi!', text: 'Gagal mengupdate status.', icon: 'error' }));
                 }
             });
         }
 
-        // --- FITUR PRINT INSTAN (CLIENT-SIDE) ---
+        // =========================================================
+        // MESIN PRINT INSTAN (DESAIN KOTAK ISO / QCC STANDARD)
+        // =========================================================
         function triggerPrintEngine(id) {
-            // 1. Cari data di memori tabel (tidak hitung server sama sekali)
             const record = localDataStore.find(item => item.id === id);
             if (!record) {
-                Swal.fire({ title: 'Gagal!', text: 'Data tidak ditemukan di sistem.', icon: 'error' });
+                Swal.fire({ title: 'Gagal!', text: 'Data tidak ditemukan di memori.', icon: 'error' });
                 return;
             }
 
-            // 2. Buka tab baru untuk wadah print
             const printWindow = window.open('', '_blank');
             
-            // 3. Rakit Desain HTML untuk Cetakan Kertas
             const htmlContent = `
             <!DOCTYPE html>
             <html lang="id">
             <head>
                 <meta charset="UTF-8">
-                <title>Print - ${record.id}</title>
+                <title>Print Document - ${record.id}</title>
                 <style>
-                    body { font-family: 'Arial', sans-serif; margin: 0; padding: 20px; color: #000; font-size: 12px; }
-                    .print-container { width: 100%; max-width: 800px; margin: 0 auto; border: 2px solid #000; padding: 20px; box-sizing: border-box; }
-                    .header { text-align: center; border-bottom: 3px double #000; padding-bottom: 15px; margin-bottom: 20px; }
-                    .header h1 { margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
-                    .header p { margin: 5px 0 0; font-size: 12px; font-weight: bold; color: #333; }
-                    
-                    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                    .info-table th, .info-table td { border: 1px solid #000; padding: 8px 10px; text-align: left; vertical-align: top; }
-                    .info-table th { width: 30%; background-color: #f4f4f4; text-transform: uppercase; font-size: 11px; }
-                    .info-table td { font-weight: bold; font-size: 13px; }
-
-                    .desc-box { border: 1px solid #000; padding: 0; margin-bottom: 20px; }
-                    .desc-title { background-color: #f4f4f4; border-bottom: 1px solid #000; padding: 8px 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-                    .desc-content { padding: 15px 10px; min-height: 100px; font-size: 13px; font-weight: normal; line-height: 1.5; white-space: pre-wrap; }
-
-                    .signature-area { display: flex; justify-content: space-between; margin-top: 30px; text-align: center; font-size: 12px; }
-                    .signature-box { width: 28%; }
-                    .signature-line { border-bottom: 1px solid #000; margin-top: 60px; margin-bottom: 5px; }
-                    
-                    @media print {
-                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                        @page { margin: 10mm; }
+                    /* Setelan Kertas A4 & Hilangkan Header/Footer Web bawaan Browser */
+                    @page { size: A4 portrait; margin: 10mm; }
+                    body { 
+                        font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; 
+                        -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff;
                     }
+                    .print-container { width: 100%; max-width: 100%; margin: 0 auto; box-sizing: border-box; }
+                    
+                    /* Tabel Kop Surat (ISO Standard) */
+                    .header-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; border: 2px solid #000; }
+                    .header-table td { border: 1px solid #000; padding: 10px; vertical-align: middle; }
+                    .header-logo { width: 20%; text-align: center; }
+                    .header-title { width: 60%; text-align: center; }
+                    .header-title h1 { margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
+                    .header-title p { margin: 4px 0 0; font-size: 12px; font-weight: bold; }
+                    .header-doc { width: 20%; font-size: 11px; line-height: 1.6; font-weight: bold; padding-left: 10px !important; }
+                    
+                    /* Tabel Informasi Data */
+                    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; border: 2px solid #000; }
+                    .info-table th, .info-table td { border: 1px solid #000; padding: 8px 10px; font-size: 13px; }
+                    .info-table th { background-color: #f4f4f4; text-transform: uppercase; font-size: 11px; width: 22%; text-align: left; }
+                    .info-table td { font-weight: bold; }
+                    
+                    /* Kotak Deskripsi */
+                    .desc-box { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid #000; }
+                    .desc-box th { background-color: #f4f4f4; border-bottom: 1px solid #000; padding: 8px 10px; font-size: 11px; text-transform: uppercase; text-align: left; }
+                    .desc-box td { padding: 15px 10px; height: 150px; vertical-align: top; font-weight: normal; font-size: 13px; white-space: pre-wrap; line-height: 1.5; }
+                    
+                    /* Tabel Tanda Tangan (Approval Hanko Box Standard Pabrik) */
+                    .signature-table { width: 100%; border-collapse: collapse; text-align: center; border: 2px solid #000; }
+                    .signature-table th, .signature-table td { border: 1px solid #000; padding: 5px; }
+                    .signature-table th { background-color: #f4f4f4; font-size: 11px; text-transform: uppercase; width: 33.33%; padding: 8px; }
+                    .signature-table td { height: 90px; vertical-align: bottom; font-weight: bold; font-size: 13px; padding-bottom: 10px; }
                 </style>
             </head>
             <body>
                 <div class="print-container">
-                    <div class="header">
-                        <h1>Form Special Request</h1>
-                        <p>Dokumen Pengendalian Produksi & Kualitas</p>
-                    </div>
+                    <table class="header-table">
+                        <tr>
+                            <td class="header-logo">
+                                <div style="font-size: 32px; font-weight: 900; letter-spacing: 2px; line-height: 1;">PR</div>
+                                <div style="font-size: 9px; font-weight: bold; letter-spacing: 3px; margin-top: 4px;">HANWA</div>
+                            </td>
+                            <td class="header-title">
+                                <h1>Form Special Request</h1>
+                                <p>Dokumen Pengendalian Produksi & Kualitas</p>
+                            </td>
+                            <td class="header-doc">
+                                Doc ID &nbsp;: ${record.id}<br>
+                                Date &nbsp;&nbsp;&nbsp;: ${record.date}<br>
+                                Status &nbsp;: <span style="text-transform: uppercase;">${record.status}</span>
+                            </td>
+                        </tr>
+                    </table>
 
                     <table class="info-table">
-                        <tr>
-                            <th>No. Document (ID)</th>
-                            <td colspan="3" style="font-size: 16px;">${record.id}</td>
-                        </tr>
-                        <tr>
-                            <th>Tanggal Request</th>
-                            <td>${record.date}</td>
-                            <th>Status Terkini</th>
-                            <td>${record.status}</td>
-                        </tr>
                         <tr>
                             <th>Departemen / PIC</th>
                             <td colspan="3">${record.dept} &mdash; ${record.pic}</td>
@@ -585,47 +592,40 @@
                         </tr>
                         <tr>
                             <th>Subject Issue</th>
-                            <td colspan="3" style="color: #d32f2f;">${record.subject}</td>
+                            <td colspan="3" style="color: #d32f2f; font-weight: 900; font-size: 14px;">${record.subject}</td>
                         </tr>
                     </table>
 
-                    <div class="desc-box">
-                        <div class="desc-title">Detail Kondisi / Deskripsi Request :</div>
-                        <div class="desc-content">${record.desc}</div>
-                    </div>
+                    <table class="desc-box">
+                        <tr><th>Detail Kondisi / Deskripsi Request :</th></tr>
+                        <tr><td>${record.desc}</td></tr>
+                    </table>
 
-                    <div class="signature-area">
-                        <div class="signature-box">
-                            <div>Dibuat Oleh (Sales/Inside),</div>
-                            <div class="signature-line"></div>
-                            <div style="font-weight:bold;">${record.pic}</div>
-                        </div>
-                        <div class="signature-box">
-                            <div>Diperiksa Oleh (PPC/QC),</div>
-                            <div class="signature-line"></div>
-                            <div>Petugas Terkait</div>
-                        </div>
-                        <div class="signature-box">
-                            <div>Disetujui Oleh,</div>
-                            <div class="signature-line"></div>
-                            <div>Manajer / Dept. Head</div>
-                        </div>
-                    </div>
+                    <table class="signature-table">
+                        <tr>
+                            <th>Dibuat Oleh (Sales/Inside)</th>
+                            <th>Diperiksa Oleh (PPC/QC)</th>
+                            <th>Disetujui Oleh</th>
+                        </tr>
+                        <tr>
+                            <td>${record.pic}</td>
+                            <td>Petugas Terkait</td>
+                            <td>Manajer / Dept. Head</td>
+                        </tr>
+                    </table>
                 </div>
 
                 <script>
-                    // Memicu jendela cetak segera setelah form HTML terbuka
                     window.onload = function() {
                         setTimeout(function() {
                             window.print();
-                        }, 200);
+                        }, 300);
                     };
                 </script>
             </body>
             </html>
             `;
 
-            // 4. Masukkan kode ke tab dan jalankan
             printWindow.document.write(htmlContent);
             printWindow.document.close();
         }
@@ -655,7 +655,6 @@
             });
             chartYearlyObj.data.datasets[0].data = monthCounts;
             chartYearlyObj.update();
-
             updateChartGraphics(filtered);
         }
 
