@@ -608,85 +608,85 @@
                 <!DOCTYPE html><html><head><title>Special Request - ${esc(r.id)}</title>
                 <meta charset="utf-8">
                 <style>
-                    @page { size: A4; margin: 15mm; }
+                    @page { size: A4; margin: 12mm; }
                     * { box-sizing: border-box; }
                     body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color:#000; }
-                    .outer { border: 1px solid #000; padding: 8px; }
-                    .head-table { width:100%; border-collapse:collapse; margin-bottom: 10px; }
-                    .head-table td { padding: 2px 4px; vertical-align: top; }
-                    .head-table .label { width: 100px; }
+                    .title { font-weight: bold; font-size: 12pt; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; }
+
+                    .head-table { width:100%; border-collapse:collapse; margin-bottom: 6px; }
+                    .head-table td { padding: 1px 4px; vertical-align: top; }
+                    .head-table .label { width: 95px; }
                     .head-table .colon { width: 12px; }
-                    .head-right { text-align: right; font-weight: bold; }
-                    .head-right .rev { font-weight: normal; font-size: 9pt; }
+                    .head-right { text-align: right; }
 
-                    .req-box { border: 1px solid #000; min-height: 230px; padding: 6px; margin-bottom: 10px; }
-                    .req-title { font-weight: bold; margin-bottom: 6px; }
+                    .req-title { font-weight: bold; margin: 4px 0; }
+
+                    .req-box { border: 1px solid #000; min-height: 300px; padding: 6px; margin-bottom: 8px; }
                     .req-table { width:100%; border-collapse:collapse; }
-                    .req-table td { padding: 2px 4px; vertical-align: top; }
-                    .req-table .label { width: 110px; }
+                    .req-table td { padding: 1px 4px; vertical-align: top; }
+                    .req-table .label { width: 95px; }
                     .req-table .colon { width: 12px; }
+                    .desc-row td { padding-top: 8px; }
 
-                    .comment-box { border: 1px solid #000; min-height: 280px; padding: 6px; margin-bottom: 10px; }
-                    .comment-title { font-weight: bold; margin-bottom: 6px; }
+                    .comment-title { font-weight: bold; margin: 4px 0; }
+                    .comment-box { border: 1px solid #000; min-height: 260px; padding: 6px; margin-bottom: 8px; }
 
-                    .footer-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-                    .footer-note { font-size: 9pt; max-width: 280px; }
+                    .footer-row { display: flex; justify-content: space-between; align-items: flex-end; }
+                    .footer-note { font-size: 9pt; max-width: 260px; }
                     .footer-note p { margin: 2px 0; }
 
-                    .sign-section { display:flex; gap: 6px; }
+                    .sign-section { display:flex; align-items: stretch; }
                     .sign-table { border-collapse: collapse; }
-                    .sign-table td { border: 1px solid #000; width: 65px; height: 60px; text-align:center; vertical-align: top; padding: 4px; font-size: 9pt; }
-                    .sign-table td.head { height: auto; font-weight: bold; vertical-align: middle; }
-                    .arrow { display:flex; align-items:center; justify-content:center; padding: 0 4px; font-size: 14pt; }
+                    .sign-table td { border: 1px solid #000; width: 64px; height: 50px; text-align:center; vertical-align: middle; padding: 4px; font-size: 9pt; }
+                    .sign-table td.head { height: auto; font-weight: normal; }
+                    .sign-table .body-cell { height: 55px; }
+                    .arrow { display:flex; align-items:center; justify-content:center; padding: 0 6px; font-size: 16pt; color: #2563eb; font-weight: bold; }
                 </style>
                 </head><body onload="window.print()">
-                    <div class="outer">
-                        <table class="head-table">
-                            <tr>
-                                <td class="label">ID Dokumen</td><td class="colon">:</td><td>${esc(r.id)}</td>
-                                <td class="head-right" style="width:35%;">SOP-SALES-001/L1 Form Special Request</td>
-                            </tr>
-                            <tr>
-                                <td class="label">DATE</td><td class="colon">:</td><td>${esc(r.date)}</td>
-                                <td class="head-right rev">Rev.0</td>
-                            </tr>
-                            <tr><td class="label">PIC</td><td class="colon">:</td><td colspan="2">${esc(r.pic)}</td></tr>
-                            <tr><td class="label">DEPARTMENT</td><td class="colon">:</td><td colspan="2">${esc(r.dept)}</td></tr>
-                            <tr><td class="label">SUBJECT</td><td class="colon">:</td><td colspan="2">${esc(r.subject)}</td></tr>
+                    <div class="title">SPECIAL REQUEST</div>
+                    <table class="head-table">
+                        <tr>
+                            <td class="label">ID Dokumen</td><td class="colon">:</td><td>${esc(r.id)}</td>
+                            <td class="head-right">HSSI/SR-1502-01</td>
+                        </tr>
+                        <tr>
+                            <td class="label">DATE</td><td class="colon">:</td><td>${esc(r.date)}</td>
+                            <td class="head-right">15Januari 2025/Rev.2</td>
+                        </tr>
+                        <tr><td class="label">PIC</td><td class="colon">:</td><td colspan="2">${esc(r.pic)}</td></tr>
+                        <tr><td class="label">DEPARTMENT</td><td class="colon">:</td><td colspan="2">${esc(r.dept)}</td></tr>
+                        <tr><td class="label">SUBJECT</td><td class="colon">:</td><td colspan="2">${esc(r.subject)}</td></tr>
+                    </table>
+
+                    <div class="req-title">Jelaskan Permohonannya ( Alasan atau tujuan dan lebih detail untuk Material / Parameter setting )</div>
+                    <div class="req-box">
+                        <table class="req-table">
+                            <tr><td class="label">CUSTOMER</td><td class="colon">:</td><td>${esc(r.customer)}</td></tr>
+                            <tr><td class="label">SPEC</td><td class="colon">:</td><td>${esc(r.spec)}</td></tr>
+                            <tr><td class="label">CC NO</td><td class="colon">:</td><td>${esc(r.cc_no)}</td></tr>
+                            <tr><td class="label">WOS_NUMBE</td><td class="colon">:</td><td>${esc(r.po)}</td></tr>
+                            <tr class="desc-row"><td class="label">DESCRIPTION</td><td class="colon">:</td><td>${esc(r.desc)}</td></tr>
                         </table>
+                    </div>
 
-                        <div class="req-box">
-                            <div class="req-title">Jelaskan Permohonannya ( Alasan atau tujuan dan lebih detail untuk Material / Parameter setting )</div>
-                            <table class="req-table">
-                                <tr><td class="label">CUSTOMER</td><td class="colon">:</td><td>${esc(r.customer)}</td></tr>
-                                <tr><td colspan="3" style="height:6px;"></td></tr>
-                                <tr><td class="label">WOS_NUMBER</td><td class="colon">:</td><td>${esc(r.po)}</td></tr>
-                                <tr><td class="label">SUBJECT</td><td class="colon">:</td><td>${esc(r.subject)}</td></tr>
-                                <tr><td class="label" style="vertical-align:top;">DESCRIPTION</td><td class="colon"></td><td>${esc(r.desc)}</td></tr>
+                    <div class="comment-title">* Komentar / Settingan khusus jika ada</div>
+                    <div class="comment-box">${esc(r.remarks)}</div>
+
+                    <div class="footer-row">
+                        <div class="footer-note">
+                            <p>* Terutama TRIAL, Form ini di pegang oleh bagian / Depart yang memohon ampai hasilnya keluar lalu buat laporan san submit ke PPC</p>
+                            <p>* Utamakan penjelaan dalam format Bahasa Indonesia</p>
+                        </div>
+                        <div class="sign-section">
+                            <table class="sign-table">
+                                <tr><td class="head">Request</td><td class="head">Check</td><td class="head">Approve</td></tr>
+                                <tr><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td></tr>
                             </table>
-                        </div>
-
-                        <div class="comment-box">
-                            <div class="comment-title">* Komentar / Settingan khusus jika ada</div>
-                            <div>${esc(r.remarks)}</div>
-                        </div>
-
-                        <div class="footer-row">
-                            <div class="footer-note">
-                                <p>* Terutama TRIAL, Form ini di pegang oleh bagian / Depart yang memohon ampai hasilnya keluar lalu buat laporan san submit ke PPC</p>
-                                <p>* Utamakan penjelaan dalam format Bahasa Indonesia</p>
-                            </div>
-                            <div class="sign-section">
-                                <table class="sign-table">
-                                    <tr><td class="head">Approve</td></tr>
-                                    <tr><td>&nbsp;</td></tr>
-                                </table>
-                                <div class="arrow">&#8596;</div>
-                                <table class="sign-table">
-                                    <tr><td class="head">PPC</td><td class="head">QC</td><td class="head">Production</td></tr>
-                                    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                                </table>
-                            </div>
+                            <div class="arrow">&#8596;</div>
+                            <table class="sign-table">
+                                <tr><td class="head">PPC</td><td class="head">QC</td><td class="head">Production</td></tr>
+                                <tr><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td></tr>
+                            </table>
                         </div>
                     </div>
                 </body></html>`;
