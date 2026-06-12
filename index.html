@@ -608,7 +608,7 @@
                 <!DOCTYPE html><html><head><title>Special Request - ${esc(r.id)}</title>
                 <meta charset="utf-8">
                 <style>
-                    @page { size: A4; margin: 100mm 120mm; }
+                    @page { size: A4; margin: 15mm 10mm; }
                     * { box-sizing: border-box; }
                     body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color:#000; }
                     .title-row { display:flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; }
@@ -662,7 +662,7 @@
                             <tr><td class="label">CUSTOMER</td><td class="colon">:</td><td>${esc(r.customer)}</td></tr>
                             <tr><td class="label">SPEC</td><td class="colon">:</td><td>${esc(r.spec)}</td></tr>
                             <tr><td class="label">CC NO</td><td class="colon">:</td><td>${esc(r.cc_no)}</td></tr>
-                            <tr><td class="label">WOS_NO</td><td class="colon">:</td><td>${esc(r.po)}</td></tr>
+                            <tr><td class="label">WOS_NUMBE</td><td class="colon">:</td><td>${esc(r.po)}</td></tr>
                             <tr class="desc-row"><td class="label">DESCRIPTION</td><td class="colon">:</td><td>${esc(r.desc)}</td></tr>
                         </table>
                     </div>
