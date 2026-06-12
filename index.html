@@ -608,16 +608,17 @@
                 <!DOCTYPE html><html><head><title>Special Request - ${esc(r.id)}</title>
                 <meta charset="utf-8">
                 <style>
-                    @page { size: A4; margin: 12mm; }
+                    @page { size: A4; margin: 15mm 18mm; }
                     * { box-sizing: border-box; }
                     body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color:#000; }
-                    .title { font-weight: bold; font-size: 12pt; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; }
+                    .title-row { display:flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; }
+                    .title { font-weight: bold; font-size: 12pt; }
+                    .doc-code { text-align: right; font-size: 10pt; }
 
                     .head-table { width:100%; border-collapse:collapse; margin-bottom: 6px; }
                     .head-table td { padding: 1px 4px; vertical-align: top; }
                     .head-table .label { width: 95px; }
                     .head-table .colon { width: 12px; }
-                    .head-right { text-align: right; }
 
                     .req-title { font-weight: bold; margin: 4px 0; }
 
@@ -643,19 +644,16 @@
                     .arrow { display:flex; align-items:center; justify-content:center; padding: 0 6px; font-size: 16pt; color: #2563eb; font-weight: bold; }
                 </style>
                 </head><body onload="window.print()">
-                    <div class="title">SPECIAL REQUEST</div>
+                    <div class="title-row">
+                        <div class="title">SPECIAL REQUEST</div>
+                        <div class="doc-code">HSSI/SR-1502-01<br>15Januari 2025/Rev.2</div>
+                    </div>
                     <table class="head-table">
-                        <tr>
-                            <td class="label">ID Dokumen</td><td class="colon">:</td><td>${esc(r.id)}</td>
-                            <td class="head-right">HSSI/SR-1502-01</td>
-                        </tr>
-                        <tr>
-                            <td class="label">DATE</td><td class="colon">:</td><td>${esc(r.date)}</td>
-                            <td class="head-right">15Januari 2025/Rev.2</td>
-                        </tr>
-                        <tr><td class="label">PIC</td><td class="colon">:</td><td colspan="2">${esc(r.pic)}</td></tr>
-                        <tr><td class="label">DEPARTMENT</td><td class="colon">:</td><td colspan="2">${esc(r.dept)}</td></tr>
-                        <tr><td class="label">SUBJECT</td><td class="colon">:</td><td colspan="2">${esc(r.subject)}</td></tr>
+                        <tr><td class="label">ID Dokumen</td><td class="colon">:</td><td>${esc(r.id)}</td></tr>
+                        <tr><td class="label">DATE</td><td class="colon">:</td><td>${esc(r.date)}</td></tr>
+                        <tr><td class="label">PIC</td><td class="colon">:</td><td>${esc(r.pic)}</td></tr>
+                        <tr><td class="label">DEPARTMENT</td><td class="colon">:</td><td>${esc(r.dept)}</td></tr>
+                        <tr><td class="label">SUBJECT</td><td class="colon">:</td><td>${esc(r.subject)}</td></tr>
                     </table>
 
                     <div class="req-title">Jelaskan Permohonannya ( Alasan atau tujuan dan lebih detail untuk Material / Parameter setting )</div>
@@ -664,7 +662,7 @@
                             <tr><td class="label">CUSTOMER</td><td class="colon">:</td><td>${esc(r.customer)}</td></tr>
                             <tr><td class="label">SPEC</td><td class="colon">:</td><td>${esc(r.spec)}</td></tr>
                             <tr><td class="label">CC NO</td><td class="colon">:</td><td>${esc(r.cc_no)}</td></tr>
-                            <tr><td class="label">WOS_NUMBE</td><td class="colon">:</td><td>${esc(r.po)}</td></tr>
+                            <tr><td class="label">WOS_NO</td><td class="colon">:</td><td>${esc(r.po)}</td></tr>
                             <tr class="desc-row"><td class="label">DESCRIPTION</td><td class="colon">:</td><td>${esc(r.desc)}</td></tr>
                         </table>
                     </div>
