@@ -171,19 +171,88 @@
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-comment-dots text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Detail Kondisi Khusus / Request</h4></div>
                             <div class="space-y-5">
                                 <div>
-                                    <label class="form-label">Subject Issue (Pilih minimal satu) <span class="text-red-500">*</span></label>
-                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200" id="subjectCheckboxGroup">
-                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Urgent Delivery" class="w-4 h-4 text-emerald-600 rounded"><span>Urgent Delivery</span></label>
-                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Urgent Proses" class="w-4 h-4 text-emerald-600 rounded"><span>Urgent Proses</span></label>
-                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Sample" class="w-4 h-4 text-emerald-600 rounded"><span>Sample</span></label>
-                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Trial Machine" class="w-4 h-4 text-emerald-600 rounded"><span>Trial Machine</span></label>
-                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Trial material" class="w-4 h-4 text-emerald-600 rounded"><span>Trial material</span></label>
-                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Trial Proses" class="w-4 h-4 text-emerald-600 rounded"><span>Trial Proses</span></label>
-                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Out of Standart" class="w-4 h-4 text-emerald-600 rounded"><span>Out of Standart</span></label>
-                                        <label class="flex items-center space-x-2 text-sm text-slate-700 font-medium cursor-pointer"><input type="checkbox" name="subjectIssue" value="Other" id="checkOther" class="w-4 h-4 text-emerald-600 rounded"><span>Other</span></label>
-                                    </div>
-                                    <div id="otherSubjectContainer" class="hidden mt-3">
-                                        <input type="text" id="otherSubjectInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject Issue kustom di sini...">
+                                    <label class="form-label">Kategori &amp; Subject Issue (Pilih minimal satu Kategori) <span class="text-red-500">*</span></label>
+                                    <div class="space-y-3" id="categoryGroup">
+
+                                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
+                                            <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
+                                                <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-time" data-kategori="TIME &amp; DELIVERY">
+                                                <span>1. TIME &amp; DELIVERY</span>
+                                            </label>
+                                            <div id="cat-time" class="hidden mt-3 pl-6 space-y-2">
+                                                <select class="subject-select w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white text-sm">
+                                                    <option value="">-- Pilih Subject --</option>
+                                                    <option value="Urgent Delivery">Urgent Delivery</option>
+                                                    <option value="Urgent Proses">Urgent Proses</option>
+                                                    <option value="Other">Other (Isi Manual)</option>
+                                                </select>
+                                                <input type="text" class="other-input hidden w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
+                                            </div>
+                                        </div>
+
+                                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
+                                            <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
+                                                <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-trial" data-kategori="TRIAL &amp; R&amp;D">
+                                                <span>2. TRIAL &amp; R&amp;D</span>
+                                            </label>
+                                            <div id="cat-trial" class="hidden mt-3 pl-6 space-y-2">
+                                                <select class="subject-select w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white text-sm">
+                                                    <option value="">-- Pilih Subject --</option>
+                                                    <option value="Material Trial (Material Baru)">Material Trial (Material Baru)</option>
+                                                    <option value="Machine Trial (Tes dengan Mesin Baru)">Machine Trial (Tes dengan Mesin Baru)</option>
+                                                    <option value="Sample (Sampel Untuk Customer)">Sample (Sampel Untuk Customer)</option>
+                                                    <option value="Other">Other (Isi Manual)</option>
+                                                </select>
+                                                <input type="text" class="other-input hidden w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
+                                            </div>
+                                        </div>
+
+                                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
+                                            <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
+                                                <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-quality" data-kategori="QUALITY &amp; SPECS">
+                                                <span>3. QUALITY &amp; SPECS</span>
+                                            </label>
+                                            <div id="cat-quality" class="hidden mt-3 pl-6 space-y-2">
+                                                <select class="subject-select w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white text-sm">
+                                                    <option value="">-- Pilih Subject --</option>
+                                                    <option value="Berat di Luar Standart">Berat di Luar Standart</option>
+                                                    <option value="OD di Luar Standart">OD di Luar Standart</option>
+                                                    <option value="Trim di Luar Standart">Trim di Luar Standart</option>
+                                                    <option value="Slitting Qty di Luar Standart">Slitting Qty di Luar Standart</option>
+                                                    <option value="Clearance di Luar Standart">Clearance di Luar Standart</option>
+                                                    <option value="Dimensi di Luar Standart">Dimensi di Luar Standart</option>
+                                                    <option value="Other">Other (Isi Manual)</option>
+                                                </select>
+                                                <input type="text" class="other-input hidden w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
+                                            </div>
+                                        </div>
+
+                                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
+                                            <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
+                                                <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-newbiz" data-kategori="NEW BUSINESS">
+                                                <span>4. NEW BUSINESS</span>
+                                            </label>
+                                            <div id="cat-newbiz" class="hidden mt-3 pl-6 space-y-2">
+                                                <select class="subject-select w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white text-sm">
+                                                    <option value="">-- Pilih Subject --</option>
+                                                    <option value="New Size">New Size</option>
+                                                    <option value="New Customer">New Customer</option>
+                                                    <option value="Other">Other (Isi Manual)</option>
+                                                </select>
+                                                <input type="text" class="other-input hidden w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
+                                            </div>
+                                        </div>
+
+                                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
+                                            <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
+                                                <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-other" data-kategori="OTHER">
+                                                <span>5. OTHER</span>
+                                            </label>
+                                            <div id="cat-other" class="hidden mt-3 pl-6 space-y-2">
+                                                <input type="text" class="other-input w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                                 <div><label class="form-label">Deskripsi Lengkap Request <span class="text-red-500">*</span></label><textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 resize-none" placeholder="Tulis instruksi khusus yang diajukan secara mendetail..."></textarea></div>
@@ -206,7 +275,7 @@
                         <table id="masterTable" class="w-full text-left text-sm text-slate-600 whitespace-nowrap cell-border">
                             <thead>
                                 <tr class="filter-header" id="filterRow"></tr>
-                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>Customer</th><th>Spec</th><th>Size</th><th>CC No</th><th>PO/Process No</th><th>Subject</th><th>Dept</th><th>PIC</th><th>Status</th><th>Action</th></tr>
+                                <tr id="headerRow"><th>ID Request</th><th>Tanggal</th><th>Customer</th><th>Spec</th><th>Size</th><th>CC No</th><th>PO/Process No</th><th>Kategori</th><th>Subject</th><th>Dept</th><th>PIC</th><th>Status</th><th>Action</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -259,7 +328,7 @@
 
     <script>
         // GANTI DENGAN URL WEB APP DEPLOYMENT TERBARU ANDA
-        const API_URL = "https://script.google.com/macros/s/AKfycby_N_jfnIH_VGVcopgWLTwpMcxQgOfgdRam57TMsVDYhxVXcyvt8JFeLeUsjRXH7rTEjQ/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbxndQ74FlN2aLrOv5wUewCka5bjvyjKEAzj6CBZNmlFGkc9g_pg_yrbYOW6CFobrWGBYA/exec"; 
         
         let localDataStore = [];
         let dtPreview, dtMaster;
@@ -281,13 +350,25 @@
             initCharts();
             fetchBackendData();
 
-            $('#checkOther').change(function() {
+            // Toggle area kategori saat checkbox utama dicentang
+            $('.category-check').change(function() {
+                const target = $('#' + $(this).data('target'));
                 if(this.checked) {
-                    $('#otherSubjectContainer').removeClass('hidden');
-                    $('#otherSubjectInput').attr('required', true).focus();
+                    target.removeClass('hidden');
                 } else {
-                    $('#otherSubjectContainer').addClass('hidden');
-                    $('#otherSubjectInput').removeAttr('required').val('');
+                    target.addClass('hidden');
+                    target.find('.subject-select').val('');
+                    target.find('.other-input').addClass('hidden').removeAttr('required').val('');
+                }
+            });
+
+            // Toggle input "Other" tiap kategori saat dropdown Subject memilih "Other"
+            $(document).on('change', '.subject-select', function() {
+                const otherInput = $(this).siblings('.other-input');
+                if($(this).val() === 'Other') {
+                    otherInput.removeClass('hidden').attr('required', true).focus();
+                } else {
+                    otherInput.addClass('hidden').removeAttr('required').val('');
                 }
             });
         });
@@ -328,6 +409,7 @@
                                 size: normalized["size"] || "-",
                                 cc_no: normalized["cc no"] || normalized["cc_no"] || "-",
                                 po: normalized["process_order_no"] || normalized["process_order"] || "-",
+                                kategori: normalized["kategori"] || "-",
                                 subject: normalized["subject"] || "-",
                                 dept: normalized["department"] || normalized["dept"] || "-",
                                 pic: normalized["pic"] || "-",
@@ -378,6 +460,7 @@
                     { data: 'size' },
                     { data: 'cc_no' },
                     { data: 'po' },
+                    { data: 'kategori' },
                     { data: 'subject' },
                     { data: 'dept' },
                     { data: 'pic' },
@@ -435,19 +518,37 @@
             document.getElementById('poInput').value = record.po; 
             document.getElementById('detailInput').value = record.desc;
 
-            $('input[name="subjectIssue"]').prop('checked', false);
-            $('#otherSubjectContainer').addClass('hidden');
-            $('#otherSubjectInput').removeAttr('required').val('');
+            // Reset semua kategori sebelum mengisi ulang
+            $('.category-check').prop('checked', false);
+            $('#categoryGroup > div > div[id^="cat-"]').addClass('hidden');
+            $('.subject-select').val('');
+            $('.other-input').addClass('hidden').removeAttr('required').val('');
 
-            if(record.subject && record.subject !== "-") {
-                const subList = record.subject.split(", ");
-                subList.forEach(sub => {
-                    if(sub.startsWith("Other: ")) {
-                        $('#checkOther').prop('checked', true);
-                        $('#otherSubjectContainer').removeClass('hidden');
-                        $('#otherSubjectInput').attr('required', true).val(sub.replace("Other: ", ""));
+            if(record.kategori && record.kategori !== "-" && record.subject && record.subject !== "-") {
+                const kategoriList = record.kategori.split(", ");
+                const subjectList = record.subject.split(", ");
+
+                kategoriList.forEach((kat, idx) => {
+                    const subVal = subjectList[idx] || "";
+                    const checkbox = $(`.category-check[data-kategori="${kat}"]`);
+                    if(!checkbox.length) return;
+
+                    checkbox.prop('checked', true);
+                    const target = $('#' + checkbox.data('target'));
+                    target.removeClass('hidden');
+
+                    const select = target.find('.subject-select');
+                    if(select.length) {
+                        const optionExists = select.find(`option[value="${subVal}"]`).length > 0;
+                        if(optionExists) {
+                            select.val(subVal);
+                        } else {
+                            select.val('Other');
+                            target.find('.other-input').removeClass('hidden').attr('required', true).val(subVal);
+                        }
                     } else {
-                        $(`input[name="subjectIssue"][value="${sub}"]`).prop('checked', true);
+                        // Kategori OTHER
+                        target.find('.other-input').val(subVal);
                     }
                 });
             }
@@ -532,22 +633,37 @@
             updateChartGraphics(filtered);
         }
 
-        // PERUBAHAN PENGIRIMAN DATA FORM UNTUK MEMASUKKAN SPEC, SIZE & CC NO
+        // PERUBAHAN PENGIRIMAN DATA FORM UNTUK MEMASUKKAN SPEC, SIZE, CC NO & KATEGORI
         function handleFormSubmit(e) {
             e.preventDefault();
+            let selectedKategori = [];
             let selectedSubjects = [];
-            $('input[name="subjectIssue"]:checked').each(function() {
-                let val = $(this).val();
-                if(val === "Other") {
-                    let textVal = document.getElementById('otherSubjectInput').value.trim();
-                    if(textVal) selectedSubjects.push("Other: " + textVal);
+
+            $('.category-check:checked').each(function() {
+                const kategori = $(this).data('kategori');
+                const target = $('#' + $(this).data('target'));
+                let subjectVal = '';
+
+                const select = target.find('.subject-select');
+                if(select.length) {
+                    if(select.val() === 'Other') {
+                        subjectVal = target.find('.other-input').val().trim();
+                    } else {
+                        subjectVal = select.val();
+                    }
                 } else {
-                    selectedSubjects.push(val);
+                    // Kategori OTHER hanya punya input manual
+                    subjectVal = target.find('.other-input').val().trim();
                 }
+
+                if(!subjectVal) return; // skip kategori tanpa subject terisi
+
+                selectedKategori.push(kategori);
+                selectedSubjects.push(subjectVal);
             });
 
-            if(selectedSubjects.length === 0) {
-                Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu pilihan Subject Issue.', icon: 'error' });
+            if(selectedKategori.length === 0) {
+                Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu Kategori dan isi Subject-nya.', icon: 'error' });
                 return;
             }
 
@@ -565,6 +681,7 @@
                 size: document.getElementById('sizeInput').value,
                 cc_no: document.getElementById('ccInput').value,
                 process_order_no: document.getElementById('poInput').value, 
+                kategori: selectedKategori.join(", "),
                 subject: selectedSubjects.join(", "),
                 description: document.getElementById('detailInput').value
             });
@@ -592,8 +709,10 @@
             document.getElementById('specialRequestForm').reset();
             document.getElementById('dateInput').valueAsDate = new Date();
             editingId = null;
-            $('#otherSubjectContainer').addClass('hidden');
-            $('#otherSubjectInput').removeAttr('required').val('');
+            $('.category-check').prop('checked', false);
+            $('#categoryGroup > div > div[id^="cat-"]').addClass('hidden');
+            $('.subject-select').val('');
+            $('.other-input').addClass('hidden').removeAttr('required').val('');
             document.getElementById('formHeaderTitle').innerText = "Form Special Request Baru";
             document.getElementById('submitBtnForm').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Simpan ke Database`;
         }
@@ -608,62 +727,93 @@
                 <!DOCTYPE html><html><head><title>Special Request - ${esc(r.id)}</title>
                 <meta charset="utf-8">
                 <style>
-                    @page { size: A4; margin: 5mm; }
+                    @page { size: A4; margin: 15mm 15mm; }
                     * { box-sizing: border-box; }
                     body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color:#000; }
+
                     .title-row { display:flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; }
                     .title { font-weight: bold; font-size: 12pt; }
-                    .doc-code { text-align: right; font-size: 10pt; }
+                    .doc-code { text-align: right; font-size: 10pt; line-height: 1.5; }
 
                     .head-table { width:100%; border-collapse:collapse; margin-bottom: 6px; }
                     .head-table td { padding: 1px 4px; vertical-align: top; }
-                    .head-table .label { width: 95px; }
+                    .head-table .label { width: 95px; white-space: nowrap; }
                     .head-table .colon { width: 12px; }
 
-                    .req-title { font-weight: bold; margin: 4px 0; }
+                    .req-title { font-weight: bold; margin: 4px 0 2px 0; font-size: 10pt; }
 
-                    .req-box { border: 1px solid #000; min-height: 300px; padding: 6px; margin-bottom: 8px; }
+                    .req-box { border: 1px solid #000; padding: 6px 8px; margin-bottom: 6px; }
                     .req-table { width:100%; border-collapse:collapse; }
-                    .req-table td { padding: 1px 4px; vertical-align: top; }
-                    .req-table .label { width: 95px; }
+                    .req-table td { padding: 2px 4px; vertical-align: top; }
+                    .req-table .label { width: 120px; white-space: nowrap; font-weight: bold; }
                     .req-table .colon { width: 12px; }
-                    .desc-row td { padding-top: 8px; }
+                    .req-table .val { word-break: break-word; }
+                    .req-table tr.spacer td { height: 6px; }
+                    .req-table tr.desc-row td { padding-top: 6px; }
 
-                    .comment-title { font-weight: bold; margin: 4px 0; }
-                    .comment-box { border: 1px solid #000; min-height: 260px; padding: 6px; margin-bottom: 8px; }
+                    .kategori-badge { display:inline-block; background:#e0f2fe; border:1px solid #7dd3fc; border-radius:4px; padding:1px 6px; font-size:9pt; margin-bottom:2px; }
+                    .subject-badge { display:inline-block; background:#f0fdf4; border:1px solid #86efac; border-radius:4px; padding:1px 6px; font-size:9pt; }
 
-                    .footer-row { display: flex; justify-content: space-between; align-items: flex-end; }
-                    .footer-note { font-size: 9pt; max-width: 260px; }
+                    .desc-area { border-top: 1px dashed #888; margin-top:6px; padding-top:6px; min-height:120px; }
+
+                    .comment-title { font-weight: bold; margin: 4px 0 2px 0; }
+                    .comment-box { border: 1px solid #000; min-height: 160px; padding: 6px 8px; margin-bottom: 6px; font-size:10pt; }
+
+                    .footer-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
+                    .footer-note { font-size: 8.5pt; max-width: 240px; line-height:1.4; }
                     .footer-note p { margin: 2px 0; }
 
-                    .sign-section { display:flex; align-items: stretch; }
+                    .sign-section { display:flex; align-items: stretch; flex-shrink:0; }
                     .sign-table { border-collapse: collapse; }
-                    .sign-table td { border: 1px solid #000; width: 64px; height: 50px; text-align:center; vertical-align: middle; padding: 4px; font-size: 9pt; }
-                    .sign-table td.head { height: auto; font-weight: normal; }
-                    .sign-table .body-cell { height: 55px; }
-                    .arrow { display:flex; align-items:center; justify-content:center; padding: 0 6px; font-size: 16pt; color: #2563eb; font-weight: bold; }
+                    .sign-table td { border: 1px solid #000; width: 58px; text-align:center; vertical-align: middle; padding: 3px; font-size: 8.5pt; }
+                    .sign-table td.head { font-weight: bold; padding: 4px 3px; }
+                    .sign-table .body-cell { height: 50px; }
+                    .arrow { display:flex; align-items:center; justify-content:center; padding: 0 5px; font-size: 16pt; color: #2563eb; font-weight: bold; }
                 </style>
                 </head><body onload="window.print()">
                     <div class="title-row">
                         <div class="title">SPECIAL REQUEST</div>
-                        <div class="doc-code">HSSI/SR-1502-01<br>15Januari 2025/Rev.2</div>
+                        <div class="doc-code">HSSI/SR-1502-01<br>15 Januari 2025/Rev.2</div>
                     </div>
+
                     <table class="head-table">
                         <tr><td class="label">ID Dokumen</td><td class="colon">:</td><td>${esc(r.id)}</td></tr>
                         <tr><td class="label">DATE</td><td class="colon">:</td><td>${esc(r.date)}</td></tr>
                         <tr><td class="label">PIC</td><td class="colon">:</td><td>${esc(r.pic)}</td></tr>
                         <tr><td class="label">DEPARTMENT</td><td class="colon">:</td><td>${esc(r.dept)}</td></tr>
-                        <tr><td class="label">SUBJECT</td><td class="colon">:</td><td>${esc(r.subject)}</td></tr>
                     </table>
 
                     <div class="req-title">Jelaskan Permohonannya ( Alasan atau tujuan dan lebih detail untuk Material / Parameter setting )</div>
                     <div class="req-box">
                         <table class="req-table">
-                            <tr><td class="label">CUSTOMER</td><td class="colon">:</td><td>${esc(r.customer)}</td></tr>
-                            <tr><td class="label">SPEC</td><td class="colon">:</td><td>${esc(r.spec)}</td></tr>
-                            <tr><td class="label">CC NO</td><td class="colon">:</td><td>${esc(r.cc_no)}</td></tr>
-                            <tr><td class="label">WOS_NUMBE</td><td class="colon">:</td><td>${esc(r.po)}</td></tr>
-                            <tr class="desc-row"><td class="label">DESCRIPTION</td><td class="colon">:</td><td>${esc(r.desc)}</td></tr>
+                            <tr>
+                                <td class="label">CUSTOMER</td><td class="colon">:</td><td class="val">${esc(r.customer)}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">SPEC</td><td class="colon">:</td><td class="val">${esc(r.spec)}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">SIZE</td><td class="colon">:</td><td class="val">${esc(r.size)}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">CC NO</td><td class="colon">:</td><td class="val">${esc(r.cc_no)}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">PROCESS ORDER NO</td><td class="colon">:</td><td class="val">${esc(r.po)}</td>
+                            </tr>
+                            <tr class="spacer"><td colspan="3"></td></tr>
+                            <tr>
+                                <td class="label">KATEGORI</td><td class="colon">:</td>
+                                <td class="val">${(r.kategori && r.kategori !== '-') ? r.kategori.split(', ').map(k => '<span class="kategori-badge">'+esc(k)+'</span>').join(' ') : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">SUBJECT</td><td class="colon">:</td>
+                                <td class="val">${(r.subject && r.subject !== '-') ? r.subject.split(', ').map(s => '<span class="subject-badge">'+esc(s)+'</span>').join(' ') : '-'}</td>
+                            </tr>
+                            <tr class="desc-row">
+                                <td class="label">DESCRIPTION</td><td class="colon">:</td>
+                                <td class="val" style="min-height:80px;">${esc(r.desc)}</td>
+                            </tr>
                         </table>
                     </div>
 
@@ -672,8 +822,8 @@
 
                     <div class="footer-row">
                         <div class="footer-note">
-                            <p>* Terutama TRIAL, Form ini di pegang oleh bagian / Depart yang memohon ampai hasilnya keluar lalu buat laporan san submit ke PPC</p>
-                            <p>* Utamakan penjelaan dalam format Bahasa Indonesia</p>
+                            <p>* Terutama TRIAL, Form ini di pegang oleh bagian / Depart yang memohon sampai hasilnya keluar lalu buat laporan dan submit ke PPC</p>
+                            <p>* Utamakan penjelasan dalam format Bahasa Indonesia</p>
                         </div>
                         <div class="sign-section">
                             <table class="sign-table">
