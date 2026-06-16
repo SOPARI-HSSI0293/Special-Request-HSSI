@@ -149,7 +149,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div><label class="form-label">Tanggal <span class="text-red-500">*</span></label><input type="date" required id="dateInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
                                 <div><label class="form-label">PIC Request <span class="text-red-500">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nama Lengkap"></div>
-                                <div><label class="form-label">Departemen Pengaju <span class="text-red-500">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="PPC / QC">Quality Control</option></select></div>
+                                <div><label class="form-label">Departemen Pengaju <span class="text-red-500">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="PPC / QC">PPC / QC</option></select></div>
                             </div>
                         </div>
                         
@@ -816,8 +816,8 @@
                                 <td class="val">${(r.subject && r.subject !== '-') ? r.subject.split(', ').map(s => '<span class="subject-badge">'+esc(s)+'</span>').join(' ') : '-'}</td>
                             </tr>
                             <tr class="desc-row">
-                                <td class="label">DESCRIPTION</td><td class="colon">:</td>
-                                <td class="val" style="min-height:80px;">${esc(r.desc)}</td>
+                               <td class="label">DESCRIPTION</td><td class="colon">:</td>
+                               <td class="val" style="min-height:80px;"><strong>${esc(r.desc)}</strong></td>
                             </tr>
                         </table>
                     </div>
@@ -837,7 +837,7 @@
                             </table>
                             <div class="arrow">&#8596;</div>
                             <table class="sign-table">
-                                <tr><td class="head">PPC</td><td class="head">QC</td><td class="head">Production</td></tr>
+                                <tr><td class="head">PPC</td><td class="head">QC</td><td class="head">Approve</td></tr>
                                 <tr><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td></tr>
                             </table>
                         </div>
