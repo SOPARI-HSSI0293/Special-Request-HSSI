@@ -37,7 +37,7 @@
                 <div class="bg-emerald-600 text-white w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
                     <i class="fa-solid fa-file-signature text-sm"></i>
                 </div>
-                <h1 class="text-lg font-bold text-slate-800 sidebar-text ml-3 whitespace-nowrap">SpecReq Hub</h1>
+                <h1 class="text-lg font-bold text-slate-800 sidebar-text ml-3 whitespace-nowrap">Special Request</h1>
             </div>
             <button onclick="toggleSidebar()" class="text-slate-400 hover:text-emerald-600 focus:outline-none flex-shrink-0 transition-colors">
                 <i class="fa-solid fa-bars text-lg"></i>
@@ -67,7 +67,7 @@
             </a>
         </nav>
         <div class="p-4 text-[10px] text-slate-400 text-center border-t border-slate-100 sidebar-text">
-            &copy; 2026 Internal Automation
+            &copy; 2026 - SOPARI
         </div>
     </aside>
 
@@ -85,7 +85,7 @@
                 <div class="bg-[#d1f2f2] rounded-xl border border-[#a5e1e1] p-5 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h3 class="text-lg font-bold text-[#0a4f4f]">Ringkasan Data Kontrol</h3>
-                        <p class="text-sm text-[#187a7a]">Pemantauan alur kerja fisik - integrasi tim Sales, PPC, QC, dan Produksi.</p>
+                        <p class="text-sm text-[#187a7a]">Data kontrol Special Request PT HSSI by HSSI-0293.</p>
                     </div>
                     <div class="flex items-center space-x-2 bg-white/60 p-1.5 rounded-lg border border-[#a5e1e1]">
                         <input type="date" id="dashStart" class="px-2 py-1 bg-transparent text-sm font-medium text-[#0a4f4f] border-none outline-none">
@@ -141,7 +141,7 @@
 
             <div id="formTab" class="view-section hidden max-w-5xl mx-auto block">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="bg-white border-b border-slate-100 px-8 py-5"><h3 class="text-xl font-bold text-slate-800" id="formHeaderTitle">Form Special Request Baru</h3><p class="text-sm text-slate-500 mt-1">Mengirim data mentah langsung menuju database pusat terpadu.</p></div>
+                    <div class="bg-white border-b border-slate-100 px-8 py-5"><h3 class="text-xl font-bold text-slate-800" id="formHeaderTitle">Form Special Request Baru</h3><p class="text-sm text-slate-500 mt-1">Data akan tersimpan di database </p></div>
                     <form id="specialRequestForm" class="p-8" onsubmit="handleFormSubmit(event)">
                         
                         <div class="mb-8">
@@ -149,7 +149,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div><label class="form-label">Tanggal <span class="text-red-500">*</span></label><input type="date" required id="dateInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
                                 <div><label class="form-label">PIC Request <span class="text-red-500">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nama Lengkap"></div>
-                                <div><label class="form-label">Departemen Pengaju <span class="text-red-500">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="Quality Control">Quality Control</option></select></div>
+                                <div><label class="form-label">Departemen Pengaju <span class="text-red-500">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="PPC / QC">Quality Control</option></select></div>
                             </div>
                         </div>
                         
@@ -158,7 +158,7 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
                                 <div><label class="form-label">Customer Name</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="PT. / CV. Penerima"></div>
-                                <div><label class="form-label">Process Order No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor Proses/PO"></div>
+                                <div><label class="form-label">Process Order No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor Proses/WOS"></div>
                                 <div><label class="form-label">CC No</label><input type="text" id="ccInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nomor CC"></div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -168,94 +168,95 @@
                         </div>
                         
                         <div class="mb-8">
-                            <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-comment-dots text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Detail Kondisi Khusus / Request</h4></div>
+                            <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-comment-dots text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Detail Kondisi / Request Khusus</h4></div>
                             <div class="space-y-5">
                                 <div>
                                     <label class="form-label">Kategori &amp; Subject Issue (Pilih minimal satu Kategori) <span class="text-red-500">*</span></label>
                                     <div class="space-y-3" id="categoryGroup">
 
+                                        <!-- 1. TIME & DELIVERY -->
                                         <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
                                             <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
                                                 <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-time" data-kategori="TIME &amp; DELIVERY">
                                                 <span>1. TIME &amp; DELIVERY</span>
                                             </label>
-                                            <div id="cat-time" class="hidden mt-3 pl-6 space-y-2">
-                                                <select class="subject-select w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white text-sm">
-                                                    <option value="">-- Pilih Subject --</option>
-                                                    <option value="Urgent Delivery">Urgent Delivery</option>
-                                                    <option value="Urgent Proses">Urgent Proses</option>
-                                                    <option value="Other">Other (Isi Manual)</option>
-                                                </select>
+                                            <div id="cat-time" class="hidden mt-3 pl-6">
+                                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Urgent Delivery"><span>Urgent Delivery</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Urgent Proses"><span>Urgent Proses</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer subject-other-toggle"><input type="checkbox" class="subject-check other-trigger w-4 h-4 text-emerald-600 rounded" value="Other"><span>Other (Isi Manual)</span></label>
+                                                </div>
                                                 <input type="text" class="other-input hidden w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
                                             </div>
                                         </div>
 
+                                        <!-- 2. TRIAL & R&D -->
                                         <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
                                             <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
                                                 <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-trial" data-kategori="TRIAL &amp; R&amp;D">
                                                 <span>2. TRIAL &amp; R&amp;D</span>
                                             </label>
-                                            <div id="cat-trial" class="hidden mt-3 pl-6 space-y-2">
-                                                <select class="subject-select w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white text-sm">
-                                                    <option value="">-- Pilih Subject --</option>
-                                                    <option value="Material Trial (Material Baru)">Material Trial (Material Baru)</option>
-                                                    <option value="Machine Trial (Tes dengan Mesin Baru)">Machine Trial (Tes dengan Mesin Baru)</option>
-                                                    <option value="Sample (Sampel Untuk Customer)">Sample (Sampel Untuk Customer)</option>
-                                                    <option value="Other">Other (Isi Manual)</option>
-                                                </select>
+                                            <div id="cat-trial" class="hidden mt-3 pl-6">
+                                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Material Trial (Material Baru)"><span>Material Trial (Material Baru)</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Machine Trial (Tes dengan Mesin Baru)"><span>Machine Trial (Tes dengan Mesin Baru)</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Sample (Sampel Untuk Customer)"><span>Sample (Sampel Untuk Customer)</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer subject-other-toggle"><input type="checkbox" class="subject-check other-trigger w-4 h-4 text-emerald-600 rounded" value="Other"><span>Other (Isi Manual)</span></label>
+                                                </div>
                                                 <input type="text" class="other-input hidden w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
                                             </div>
                                         </div>
 
+                                        <!-- 3. QUALITY & SPECS -->
                                         <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
                                             <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
                                                 <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-quality" data-kategori="QUALITY &amp; SPECS">
                                                 <span>3. QUALITY &amp; SPECS</span>
                                             </label>
-                                            <div id="cat-quality" class="hidden mt-3 pl-6 space-y-2">
-                                                <select class="subject-select w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white text-sm">
-                                                    <option value="">-- Pilih Subject --</option>
-                                                    <option value="Berat di Luar Standart">Berat di Luar Standart</option>
-                                                    <option value="OD di Luar Standart">OD di Luar Standart</option>
-                                                    <option value="Trim di Luar Standart">Trim di Luar Standart</option>
-                                                    <option value="Slitting Qty di Luar Standart">Slitting Qty di Luar Standart</option>
-                                                    <option value="Clearance di Luar Standart">Clearance di Luar Standart</option>
-                                                    <option value="Dimensi di Luar Standart">Dimensi di Luar Standart</option>
-                                                    <option value="Other">Other (Isi Manual)</option>
-                                                </select>
+                                            <div id="cat-quality" class="hidden mt-3 pl-6">
+                                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Berat di Luar Standart"><span>Berat di Luar Standart</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="OD di Luar Standart"><span>OD di Luar Standart</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Trim di Luar Standart"><span>Trim di Luar Standart</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Slitting Qty di Luar Standart"><span>Slitting Qty di Luar Standart</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Clearance di Luar Standart"><span>Clearance di Luar Standart</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="Dimensi di Luar Standart"><span>Dimensi di Luar Standart</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer subject-other-toggle"><input type="checkbox" class="subject-check other-trigger w-4 h-4 text-emerald-600 rounded" value="Other"><span>Other (Isi Manual)</span></label>
+                                                </div>
                                                 <input type="text" class="other-input hidden w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
                                             </div>
                                         </div>
 
+                                        <!-- 4. NEW BUSINESS -->
                                         <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
                                             <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
                                                 <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-newbiz" data-kategori="NEW BUSINESS">
                                                 <span>4. NEW BUSINESS</span>
                                             </label>
-                                            <div id="cat-newbiz" class="hidden mt-3 pl-6 space-y-2">
-                                                <select class="subject-select w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white text-sm">
-                                                    <option value="">-- Pilih Subject --</option>
-                                                    <option value="New Size">New Size</option>
-                                                    <option value="New Customer">New Customer</option>
-                                                    <option value="Other">Other (Isi Manual)</option>
-                                                </select>
+                                            <div id="cat-newbiz" class="hidden mt-3 pl-6">
+                                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="New Size"><span>New Size</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="New Customer"><span>New Customer</span></label>
+                                                    <label class="flex items-center gap-2 text-sm cursor-pointer subject-other-toggle"><input type="checkbox" class="subject-check other-trigger w-4 h-4 text-emerald-600 rounded" value="Other"><span>Other (Isi Manual)</span></label>
+                                                </div>
                                                 <input type="text" class="other-input hidden w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
                                             </div>
                                         </div>
 
+                                        <!-- 5. OTHER -->
                                         <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
                                             <label class="flex items-center space-x-2 text-sm font-bold text-slate-800 cursor-pointer">
                                                 <input type="checkbox" class="category-check w-4 h-4 text-emerald-600 rounded" data-target="cat-other" data-kategori="OTHER">
                                                 <span>5. OTHER</span>
                                             </label>
-                                            <div id="cat-other" class="hidden mt-3 pl-6 space-y-2">
+                                            <div id="cat-other" class="hidden mt-3 pl-6">
                                                 <input type="text" class="other-input w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 text-sm" placeholder="Ketik Subject kustom di sini...">
                                             </div>
                                         </div>
 
                                     </div>
                                 </div>
-                                <div><label class="form-label">Deskripsi Lengkap Request <span class="text-red-500">*</span></label><textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 resize-none" placeholder="Tulis instruksi khusus yang diajukan secara mendetail..."></textarea></div>
+                                <div><label class="form-label">Deskripsi Request <span class="text-red-500">*</span></label><textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 resize-none" placeholder="Tulis instruksi khusus yang diajukan dengan jelas..."></textarea></div>
                             </div>
                         </div>
                         <div class="flex justify-end gap-3 pt-4">
@@ -312,13 +313,13 @@
             <div id="infoTab" class="view-section hidden max-w-5xl mx-auto block">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="bg-slate-900 text-white p-6">
-                        <h3 class="text-xl font-bold">Panduan Alur Sistem Hybrid</h3>
-                        <p class="text-slate-400 text-sm mt-1">Panduan sinkronisasi dokumen fisik dengan data sistem digital.</p>
+                        <h3 class="text-xl font-bold">Panduan Penggunaan</h3>
+                        <p class="text-slate-400 text-sm mt-1">Panduan penggunaan Aplikasi Special Request PT. HSSI V.0.1.</p>
                     </div>
                     <div class="p-6 space-y-4 text-sm text-slate-600 leading-relaxed">
-                        <p>1. <strong>Tim Sales Inside</strong> menginput data form baru melalui tab input. Saat disimpan, status otomatis bernilai <strong>Open (Menunggu Fisik)</strong>.</p>
-                        <p>2. Sales menekan ikon <strong>Print</strong> pada tabel. Sistem GAS akan otomatis menyalin <code>Template_Cetak</code>, mengonversi ke PDF, memicu jendela cetak printer, dan menghapus kembali sheet salinan.</p>
-                        <p>3. Kertas dibawa berkeliling untuk approval fisik. Setelah lembar kertas masuk ke <strong>PPC / QC</strong>, petugas departemen mengeklik tombol <strong>Edit</strong> untuk memperbarui data, atau tombol <strong>Stempel</strong> untuk mengubah status proses akhir.</p>
+                        <p>1. <strong>Pemohon</strong> menginput data form baru melalui tab Input Request. Saat disimpan, status otomatis bernilai <strong>Open </strong>.</p>
+                        <p>2. Pemohon dapat mencetak form dari icon <strong>Print</strong> pada tabel di Data Master maupun dari Dashboard. Sistem akan menyiapkan file PDF preview yang dapat langsung di print.</p>
+                        <p>3. Sistem akan menampilkan summary data di  <strong>Analitik</strong>, User dapat melihat data dari rentang waktu yang di pilih dengan menekan tombol <strong>Update Grafik</strong> .</p>
                     </div>
                 </div>
             </div>
@@ -357,15 +358,15 @@
                     target.removeClass('hidden');
                 } else {
                     target.addClass('hidden');
-                    target.find('.subject-select').val('');
+                    target.find('.subject-check').prop('checked', false);
                     target.find('.other-input').addClass('hidden').removeAttr('required').val('');
                 }
             });
 
-            // Toggle input "Other" tiap kategori saat dropdown Subject memilih "Other"
-            $(document).on('change', '.subject-select', function() {
-                const otherInput = $(this).siblings('.other-input');
-                if($(this).val() === 'Other') {
+            // Toggle input "Other" saat checkbox Other dicentang
+            $(document).on('change', '.other-trigger', function() {
+                const otherInput = $(this).closest('div[id^="cat-"]').find('.other-input');
+                if(this.checked) {
                     otherInput.removeClass('hidden').attr('required', true).focus();
                 } else {
                     otherInput.addClass('hidden').removeAttr('required').val('');
@@ -521,7 +522,7 @@
             // Reset semua kategori sebelum mengisi ulang
             $('.category-check').prop('checked', false);
             $('#categoryGroup > div > div[id^="cat-"]').addClass('hidden');
-            $('.subject-select').val('');
+            $('.subject-check').prop('checked', false);
             $('.other-input').addClass('hidden').removeAttr('required').val('');
 
             if(record.kategori && record.kategori !== "-" && record.subject && record.subject !== "-") {
@@ -537,17 +538,17 @@
                     const target = $('#' + checkbox.data('target'));
                     target.removeClass('hidden');
 
-                    const select = target.find('.subject-select');
-                    if(select.length) {
-                        const optionExists = select.find(`option[value="${subVal}"]`).length > 0;
-                        if(optionExists) {
-                            select.val(subVal);
-                        } else {
-                            select.val('Other');
-                            target.find('.other-input').removeClass('hidden').attr('required', true).val(subVal);
+                    const subParts = subVal.split(' + ').map(s => s.trim());
+                    subParts.forEach(s => {
+                        const subChk = target.find(`.subject-check[value="${s}"]`);
+                        if(subChk.length) {
+                            subChk.prop('checked', true);
+                        } else if(s) {
+                            target.find('.other-trigger').prop('checked', true);
+                            target.find('.other-input').removeClass('hidden').attr('required', true).val(s);
                         }
-                    } else {
-                        // Kategori OTHER
+                    });
+                    if(!target.find('.subject-check').length && subVal) {
                         target.find('.other-input').val(subVal);
                     }
                 });
@@ -642,24 +643,28 @@
             $('.category-check:checked').each(function() {
                 const kategori = $(this).data('kategori');
                 const target = $('#' + $(this).data('target'));
-                let subjectVal = '';
+                let subjects = [];
 
-                const select = target.find('.subject-select');
-                if(select.length) {
-                    if(select.val() === 'Other') {
-                        subjectVal = target.find('.other-input').val().trim();
-                    } else {
-                        subjectVal = select.val();
-                    }
+                const checks = target.find('.subject-check:checked');
+                if(checks.length) {
+                    checks.each(function() {
+                        if($(this).val() === 'Other') {
+                            const customVal = target.find('.other-input').val().trim();
+                            if(customVal) subjects.push(customVal);
+                        } else {
+                            subjects.push($(this).val());
+                        }
+                    });
                 } else {
-                    // Kategori OTHER hanya punya input manual
-                    subjectVal = target.find('.other-input').val().trim();
+                    // Kategori OTHER: ambil dari other-input langsung
+                    const manualVal = target.find('.other-input').val().trim();
+                    if(manualVal) subjects.push(manualVal);
                 }
 
-                if(!subjectVal) return; // skip kategori tanpa subject terisi
+                if(subjects.length === 0) return;
 
                 selectedKategori.push(kategori);
-                selectedSubjects.push(subjectVal);
+                selectedSubjects.push(subjects.join(' + '));
             });
 
             if(selectedKategori.length === 0) {
@@ -711,7 +716,7 @@
             editingId = null;
             $('.category-check').prop('checked', false);
             $('#categoryGroup > div > div[id^="cat-"]').addClass('hidden');
-            $('.subject-select').val('');
+            $('.subject-check').prop('checked', false);
             $('.other-input').addClass('hidden').removeAttr('required').val('');
             document.getElementById('formHeaderTitle').innerText = "Form Special Request Baru";
             document.getElementById('submitBtnForm').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Simpan ke Database`;
