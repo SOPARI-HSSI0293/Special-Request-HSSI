@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Special Request-Digit Data</title>
+    <title>SpecReq Hub - Core System</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -37,7 +37,7 @@
                 <div class="bg-emerald-600 text-white w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
                     <i class="fa-solid fa-file-signature text-sm"></i>
                 </div>
-                <h1 class="text-lg font-bold text-slate-800 sidebar-text ml-3 whitespace-nowrap">Special Request</h1>
+                <h1 class="text-lg font-bold text-slate-800 sidebar-text ml-3 whitespace-nowrap">SpecReq Hub</h1>
             </div>
             <button onclick="toggleSidebar()" class="text-slate-400 hover:text-emerald-600 focus:outline-none flex-shrink-0 transition-colors">
                 <i class="fa-solid fa-bars text-lg"></i>
@@ -57,6 +57,10 @@
                 <i class="fa-solid fa-database w-6 text-center text-lg flex-shrink-0"></i>
                 <span class="font-medium sidebar-text ml-2">Data Master</span>
             </a>
+            <a href="#" onclick="switchTab('templateTab')" id="nav-templateTab" class="nav-btn flex items-center px-3 py-3 rounded-xl transition-colors text-slate-500">
+                <i class="fa-solid fa-layer-group w-6 text-center text-lg flex-shrink-0"></i>
+                <span class="font-medium sidebar-text ml-2">Template</span>
+            </a>
             <a href="#" onclick="switchTab('analyticsTab')" id="nav-analyticsTab" class="nav-btn flex items-center px-3 py-3 rounded-xl transition-colors text-slate-500">
                 <i class="fa-solid fa-chart-line w-6 text-center text-lg flex-shrink-0"></i>
                 <span class="font-medium sidebar-text ml-2">Analitik</span>
@@ -67,7 +71,7 @@
             </a>
         </nav>
         <div class="p-4 text-[10px] text-slate-400 text-center border-t border-slate-100 sidebar-text">
-            &copy; 2026 - SOPARI
+            &copy; 2026 Internal Automation
         </div>
     </aside>
 
@@ -85,7 +89,7 @@
                 <div class="bg-[#d1f2f2] rounded-xl border border-[#a5e1e1] p-5 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h3 class="text-lg font-bold text-[#0a4f4f]">Ringkasan Data Kontrol</h3>
-                        <p class="text-sm text-[#187a7a]">Data kontrol Special Request PT HSSI by HSSI-0293.</p>
+                        <p class="text-sm text-[#187a7a]">Pemantauan alur kerja fisik - integrasi tim Sales, PPC, QC, dan Produksi.</p>
                     </div>
                     <div class="flex items-center space-x-2 bg-white/60 p-1.5 rounded-lg border border-[#a5e1e1]">
                         <input type="date" id="dashStart" class="px-2 py-1 bg-transparent text-sm font-medium text-[#0a4f4f] border-none outline-none">
@@ -141,7 +145,7 @@
 
             <div id="formTab" class="view-section hidden max-w-5xl mx-auto block">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="bg-white border-b border-slate-100 px-8 py-5"><h3 class="text-xl font-bold text-slate-800" id="formHeaderTitle">Form Special Request Baru</h3><p class="text-sm text-slate-500 mt-1">Data akan tersimpan di database </p></div>
+                    <div class="bg-white border-b border-slate-100 px-8 py-5"><h3 class="text-xl font-bold text-slate-800" id="formHeaderTitle">Form Special Request Baru</h3><p class="text-sm text-slate-500 mt-1">Mengirim data mentah langsung menuju database pusat terpadu.</p></div>
                     <form id="specialRequestForm" class="p-8" onsubmit="handleFormSubmit(event)">
                         
                         <div class="mb-8">
@@ -149,7 +153,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div><label class="form-label">Tanggal <span class="text-red-500">*</span></label><input type="date" required id="dateInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500"></div>
                                 <div><label class="form-label">PIC Request <span class="text-red-500">*</span></label><input type="text" required id="picInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nama Lengkap"></div>
-                                <div><label class="form-label">Departemen Pengaju <span class="text-red-500">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="PPC / QC">PPC / QC</option></select></div>
+                                <div><label class="form-label">Departemen Pengaju <span class="text-red-500">*</span></label><select id="deptInput" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 bg-white"><option value="Sales">Sales</option><option value="Production">Production</option><option value="Quality Control">Quality Control</option></select></div>
                             </div>
                         </div>
                         
@@ -158,7 +162,7 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
                                 <div><label class="form-label">Customer Name</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="PT. / CV. Penerima"></div>
-                                <div><label class="form-label">Process Order No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor Proses/WOS"></div>
+                                <div><label class="form-label">Process Order No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor Proses/PO"></div>
                                 <div><label class="form-label">CC No</label><input type="text" id="ccInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nomor CC"></div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -168,7 +172,7 @@
                         </div>
                         
                         <div class="mb-8">
-                            <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-comment-dots text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Detail Kondisi / Request Khusus</h4></div>
+                            <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-comment-dots text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Detail Kondisi Khusus / Request</h4></div>
                             <div class="space-y-5">
                                 <div>
                                     <label class="form-label">Kategori &amp; Subject Issue (Pilih minimal satu Kategori) <span class="text-red-500">*</span></label>
@@ -256,7 +260,7 @@
 
                                     </div>
                                 </div>
-                                <div><label class="form-label">Deskripsi Request <span class="text-red-500">*</span></label><textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 resize-none" placeholder="Tulis instruksi khusus yang diajukan dengan jelas..."></textarea></div>
+                                <div><label class="form-label">Deskripsi Lengkap Request <span class="text-red-500">*</span></label><textarea id="detailInput" rows="4" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 resize-none" placeholder="Tulis instruksi khusus yang diajukan secara mendetail..."></textarea></div>
                             </div>
                         </div>
                         <div class="flex justify-end gap-3 pt-4">
@@ -283,6 +287,132 @@
                     </div>
                 </div>
             </div>
+
+            <!-- =================== TEMPLATE TAB =================== -->
+            <div id="templateTab" class="view-section hidden max-w-[98%] mx-auto block">
+                <div class="bg-white rounded-xl shadow-sm border border-purple-100 overflow-hidden mb-6">
+                    <div class="px-5 py-4 border-b border-purple-100 flex justify-between items-center bg-purple-50">
+                        <div>
+                            <h3 class="text-lg font-bold text-purple-800 tracking-tight"><i class="fa-solid fa-layer-group mr-2"></i>Daftar Template Request</h3>
+                            <p class="text-xs text-purple-500 mt-0.5">Gunakan template untuk mengisi form request lebih cepat.</p>
+                        </div>
+                        <button onclick="openTemplateForm()" class="bg-purple-600 text-white font-bold px-5 py-2.5 rounded-lg shadow hover:bg-purple-700 transition-all flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-plus"></i> Tambah Template
+                        </button>
+                    </div>
+                    <div class="p-6 overflow-x-auto w-full">
+                        <table id="templateTable" class="w-full text-left text-sm text-slate-600 whitespace-nowrap cell-border">
+                            <thead>
+                                <tr id="templateHeaderRow">
+                                    <th>ID Template</th><th>Customer</th><th>Spec</th><th>Size</th>
+                                    <th>Kategori</th><th>Subject</th><th>Dept</th><th>PIC</th><th>Deskripsi</th><th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div id="templateLoading" class="text-center py-10 text-slate-400 hidden"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat template...</div>
+                        <div id="templateEmpty" class="text-center py-10 text-slate-400 hidden"><i class="fa-solid fa-inbox mr-2"></i>Belum ada template. Klik "Tambah Template" untuk membuat.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL FORM TEMPLATE -->
+            <div id="templateModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 sticky top-0 bg-white rounded-t-2xl z-10">
+                        <h4 id="templateModalTitle" class="text-lg font-bold text-slate-800"><i class="fa-solid fa-layer-group text-purple-500 mr-2"></i>Tambah Template Baru</h4>
+                        <button onclick="closeTemplateModal()" class="text-slate-400 hover:text-red-500 text-xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <form id="templateForm" onsubmit="handleTemplateSave(event)" class="px-6 py-5 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div><label class="form-label">Customer</label><input type="text" id="tplCustomer" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-purple-500 text-sm" placeholder="Nama customer"></div>
+                            <div><label class="form-label">Spec</label><input type="text" id="tplSpec" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-purple-500 text-sm" placeholder="Nomor spec"></div>
+                            <div><label class="form-label">Size</label><input type="text" id="tplSize" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-purple-500 text-sm" placeholder="Ukuran"></div>
+                            <div><label class="form-label">Department</label><input type="text" id="tplDept" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-purple-500 text-sm" placeholder="Nama department"></div>
+                            <div><label class="form-label">PIC</label><input type="text" id="tplPic" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-purple-500 text-sm" placeholder="Nama PIC"></div>
+                        </div>
+                        <!-- Kategori & Subject (reuse same structure) -->
+                        <div>
+                            <label class="form-label">Kategori &amp; Subject <span class="text-slate-400 text-xs font-normal">(opsional)</span></label>
+                            <div class="space-y-2" id="tplCategoryGroup">
+                                <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                                    <label class="flex items-center space-x-2 text-sm font-bold text-slate-700 cursor-pointer">
+                                        <input type="checkbox" class="tpl-cat-check w-4 h-4 text-purple-600 rounded" data-target="tpl-cat-time" data-kategori="TIME &amp; DELIVERY">
+                                        <span>1. TIME &amp; DELIVERY</span></label>
+                                    <div id="tpl-cat-time" class="hidden mt-2 pl-5">
+                                        <div class="grid grid-cols-2 gap-1.5 mb-1.5">
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Urgent Delivery"><span>Urgent Delivery</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Urgent Proses"><span>Urgent Proses</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check tpl-other-trigger w-3.5 h-3.5 text-purple-600 rounded" value="Other"><span>Other</span></label>
+                                        </div>
+                                        <input type="text" class="tpl-other-input hidden w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs outline-none focus:border-purple-500" placeholder="Ketik kustom...">
+                                    </div>
+                                </div>
+                                <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                                    <label class="flex items-center space-x-2 text-sm font-bold text-slate-700 cursor-pointer">
+                                        <input type="checkbox" class="tpl-cat-check w-4 h-4 text-purple-600 rounded" data-target="tpl-cat-trial" data-kategori="TRIAL &amp; R&amp;D">
+                                        <span>2. TRIAL &amp; R&amp;D</span></label>
+                                    <div id="tpl-cat-trial" class="hidden mt-2 pl-5">
+                                        <div class="grid grid-cols-2 gap-1.5 mb-1.5">
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Material Trial (Material Baru)"><span>Material Trial</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Machine Trial (Tes dengan Mesin Baru)"><span>Machine Trial</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Sample (Sampel Untuk Customer)"><span>Sample</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check tpl-other-trigger w-3.5 h-3.5 text-purple-600 rounded" value="Other"><span>Other</span></label>
+                                        </div>
+                                        <input type="text" class="tpl-other-input hidden w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs outline-none focus:border-purple-500" placeholder="Ketik kustom...">
+                                    </div>
+                                </div>
+                                <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                                    <label class="flex items-center space-x-2 text-sm font-bold text-slate-700 cursor-pointer">
+                                        <input type="checkbox" class="tpl-cat-check w-4 h-4 text-purple-600 rounded" data-target="tpl-cat-quality" data-kategori="QUALITY &amp; SPECS">
+                                        <span>3. QUALITY &amp; SPECS</span></label>
+                                    <div id="tpl-cat-quality" class="hidden mt-2 pl-5">
+                                        <div class="grid grid-cols-2 gap-1.5 mb-1.5">
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Berat di Luar Standart"><span>Berat di Luar Standart</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="OD di Luar Standart"><span>OD di Luar Standart</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Trim di Luar Standart"><span>Trim di Luar Standart</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Slitting Qty di Luar Standart"><span>Slitting Qty</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Clearance di Luar Standart"><span>Clearance</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="Dimensi di Luar Standart"><span>Dimensi</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check tpl-other-trigger w-3.5 h-3.5 text-purple-600 rounded" value="Other"><span>Other</span></label>
+                                        </div>
+                                        <input type="text" class="tpl-other-input hidden w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs outline-none focus:border-purple-500" placeholder="Ketik kustom...">
+                                    </div>
+                                </div>
+                                <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                                    <label class="flex items-center space-x-2 text-sm font-bold text-slate-700 cursor-pointer">
+                                        <input type="checkbox" class="tpl-cat-check w-4 h-4 text-purple-600 rounded" data-target="tpl-cat-newbiz" data-kategori="NEW BUSINESS">
+                                        <span>4. NEW BUSINESS</span></label>
+                                    <div id="tpl-cat-newbiz" class="hidden mt-2 pl-5">
+                                        <div class="grid grid-cols-2 gap-1.5 mb-1.5">
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="New Size"><span>New Size</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check w-3.5 h-3.5 text-purple-600 rounded" value="New Customer"><span>New Customer</span></label>
+                                            <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" class="tpl-sub-check tpl-other-trigger w-3.5 h-3.5 text-purple-600 rounded" value="Other"><span>Other</span></label>
+                                        </div>
+                                        <input type="text" class="tpl-other-input hidden w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs outline-none focus:border-purple-500" placeholder="Ketik kustom...">
+                                    </div>
+                                </div>
+                                <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                                    <label class="flex items-center space-x-2 text-sm font-bold text-slate-700 cursor-pointer">
+                                        <input type="checkbox" class="tpl-cat-check w-4 h-4 text-purple-600 rounded" data-target="tpl-cat-other" data-kategori="OTHER">
+                                        <span>5. OTHER</span></label>
+                                    <div id="tpl-cat-other" class="hidden mt-2 pl-5">
+                                        <input type="text" class="tpl-other-input w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs outline-none focus:border-purple-500" placeholder="Ketik kustom...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div><label class="form-label">Deskripsi</label>
+                            <textarea id="tplDesc" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-purple-500 resize-none text-sm" placeholder="Deskripsi umum untuk template ini..."></textarea>
+                        </div>
+                        <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+                            <button type="button" onclick="closeTemplateModal()" class="px-5 py-2 text-slate-500 bg-slate-100 rounded-lg text-sm">Batal</button>
+                            <button type="submit" class="px-6 py-2 text-white bg-purple-600 rounded-lg shadow font-semibold text-sm hover:bg-purple-700"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Template</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- =================== END TEMPLATE TAB =================== -->
 
             <div id="analyticsTab" class="view-section hidden max-w-7xl mx-auto block">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-6">
@@ -313,19 +443,13 @@
             <div id="infoTab" class="view-section hidden max-w-5xl mx-auto block">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="bg-slate-900 text-white p-6">
-    <h3 class="text-xl font-bold">Dukung kami untuk terus tumbuh di link berikut</h3>
-    <p class="text-slate-400 text-sm mt-1">
-        <a href="https://saweria.co/digitdata" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors">
-            https://saweria.co/digitdata
-        </a>
-    </p>
-</div>
+                        <h3 class="text-xl font-bold">Panduan Alur Sistem Hybrid</h3>
+                        <p class="text-slate-400 text-sm mt-1">Panduan sinkronisasi dokumen fisik dengan data sistem digital.</p>
+                    </div>
                     <div class="p-6 space-y-4 text-sm text-slate-600 leading-relaxed">
-                        <p>1. <strong>Dashboard</strong> Halaman ini akan menampilkan Ringkasan Data Special Request yang masuk.Halaman ini juga dapat di pakai untuk input data form baru melalui button <strong>New Request</strong>. Data terbaru akan di tampilkan di mini tabel.</p>
-                        <p>2. <strong>Input Request</strong> Halaman ini di pakai untuk input Data baru.Isi data dengan jelas dan mudah di mengerti. Utamakan deskripsi dalam bahasa Indonesia</p>
-                        <p>3. <strong>Data Master</strong> Halaman ini akan menampilkan semua data di database.Kita dapat mencari data SR tertentu dengan pencarian atau filter.Pemohon dapat mencetak form dari icon <strong>Print</strong> pada tabel.Sistem akan menyiapkan file PDF preview untuk di print.</p>
-                        <p>4. <strong>Analitik</strong> User dapat melihat data dari rentang waktu yang di pilih dengan menekan tombol <strong>Update Grafik</strong> .</p>
-                        <p>5. <strong>Informasi</strong> Halaman ini adalah informasi singkat tentang feature aplikasi Special Request  .</p>
+                        <p>1. <strong>Tim Sales Inside</strong> menginput data form baru melalui tab input. Saat disimpan, status otomatis bernilai <strong>Open (Menunggu Fisik)</strong>.</p>
+                        <p>2. Sales menekan ikon <strong>Print</strong> pada tabel. Sistem GAS akan otomatis menyalin <code>Template_Cetak</code>, mengonversi ke PDF, memicu jendela cetak printer, dan menghapus kembali sheet salinan.</p>
+                        <p>3. Kertas dibawa berkeliling untuk approval fisik. Setelah lembar kertas masuk ke <strong>PPC / QC</strong>, petugas departemen mengeklik tombol <strong>Edit</strong> untuk memperbarui data, atau tombol <strong>Stempel</strong> untuk mengubah status proses akhir.</p>
                     </div>
                 </div>
             </div>
@@ -338,7 +462,8 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbxndQ74FlN2aLrOv5wUewCka5bjvyjKEAzj6CBZNmlFGkc9g_pg_yrbYOW6CFobrWGBYA/exec"; 
         
         let localDataStore = [];
-        let dtPreview, dtMaster;
+        let templateDataStore = [];
+        let dtPreview, dtMaster, dtTemplate;
         let chartYearlyObj, chartCustomerObj, chartSubjectObj;
         let editingId = null; 
 
@@ -391,6 +516,7 @@
             $('#nav-' + tabId).addClass('bg-emerald-600 text-white shadow-md').removeClass('text-slate-500');
             $('#pageTitle').text($('#nav-' + tabId + ' span').text());
             if(tabId === 'tableTab' && dtMaster) dtMaster.columns.adjust();
+            if(tabId === 'templateTab') { if(dtTemplate) dtTemplate.columns.adjust(); else fetchTemplateData(); }
         }
 
         // PENGAMBILAN DATA DENGAN MAPPING BARU (TERMASUK SPEC, SIZE, CC NO)
@@ -822,8 +948,8 @@
                                 <td class="val">${(r.subject && r.subject !== '-') ? r.subject.split(', ').map(s => '<span class="subject-badge">'+esc(s)+'</span>').join(' ') : '-'}</td>
                             </tr>
                             <tr class="desc-row">
-                               <td class="label">DESCRIPTION</td><td class="colon">:</td>
-                               <td class="val" style="min-height:80px;"><strong>${esc(r.desc)}</strong></td>
+                                <td class="label">DESCRIPTION</td><td class="colon">:</td>
+                                <td class="val" style="min-height:80px;">${esc(r.desc)}</td>
                             </tr>
                         </table>
                     </div>
@@ -843,7 +969,7 @@
                             </table>
                             <div class="arrow">&#8596;</div>
                             <table class="sign-table">
-                                <tr><td class="head">PPC</td><td class="head">QC</td><td class="head">Approve</td></tr>
+                                <tr><td class="head">PPC</td><td class="head">QC</td><td class="head">Production</td></tr>
                                 <tr><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td></tr>
                             </table>
                         </div>
@@ -855,6 +981,199 @@
             win.document.write(printHtml);
             win.document.close();
         }
+
+        // ========== TEMPLATE FUNCTIONS ==========
+
+        function fetchTemplateData() {
+            $('#templateLoading').removeClass('hidden');
+            $('#templateEmpty').addClass('hidden');
+            const buster = new Date().getTime();
+            fetch(API_URL + "?action=readTemplate&v=" + buster)
+                .then(r => r.json())
+                .then(res => {
+                    $('#templateLoading').addClass('hidden');
+                    if(res.status === "success") {
+                        templateDataStore = res.data.map(row => {
+                            const n = {};
+                            for(let k in row) n[k.toLowerCase().trim()] = row[k];
+                            return {
+                                id: n["id template"] || n["id"] || "-",
+                                customer: n["customer"] || "-",
+                                spec: n["spec"] || "-",
+                                size: n["size"] || "-",
+                                kategori: n["kategori"] || "-",
+                                subject: n["subject"] || "-",
+                                dept: n["department"] || n["dept"] || "-",
+                                pic: n["pic"] || "-",
+                                desc: n["description"] || n["desc"] || "-"
+                            };
+                        });
+                        renderTemplateTable();
+                    } else {
+                        Swal.fire('Error', res.message, 'error');
+                    }
+                })
+                .catch(() => {
+                    $('#templateLoading').addClass('hidden');
+                    Swal.fire('Error Koneksi', 'Gagal memuat template.', 'error');
+                });
+        }
+
+        function renderTemplateTable() {
+            if(templateDataStore.length === 0) { $('#templateEmpty').removeClass('hidden'); }
+            if($.fn.DataTable.isDataTable('#templateTable')) $('#templateTable').DataTable().destroy();
+            dtTemplate = $('#templateTable').DataTable({
+                data: templateDataStore,
+                columns: [
+                    { data: 'id', render: d => `<span class="font-bold text-purple-700">${d}</span>` },
+                    { data: 'customer' },
+                    { data: 'spec' },
+                    { data: 'size' },
+                    { data: 'kategori', render: d => d !== '-' ? d.split(', ').map(k => `<span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full mr-1">${k}</span>`).join('') : '-' },
+                    { data: 'subject', render: d => d !== '-' ? d.split(', ').map(s => `<span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full mr-1">${s}</span>`).join('') : '-' },
+                    { data: 'dept' },
+                    { data: 'pic' },
+                    { data: 'desc', render: d => d.length > 40 ? d.substring(0,40)+'...' : d },
+                    { data: null, orderable: false, className: "text-center", render: (data, type, row) =>
+                        `<button onclick="useTemplate('${row.id}')" title="Gunakan Template" class="bg-purple-100 hover:bg-purple-600 hover:text-white text-purple-700 text-xs font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 mx-auto"><i class="fa-solid fa-arrow-right-to-bracket"></i> Gunakan</button>`
+                    }
+                ],
+                order: [[0, 'asc']],
+                dom: '<"flex flex-col sm:flex-row justify-between items-center mb-4"lf>rtip',
+                scrollX: true,
+                language: { emptyTable: "Belum ada template.", zeroRecords: "Template tidak ditemukan." }
+            });
+        }
+
+        function openTemplateForm() {
+            // Reset form
+            document.getElementById('templateForm').reset();
+            $('.tpl-cat-check').prop('checked', false);
+            $('#tplCategoryGroup > div > div[id^="tpl-cat-"]').addClass('hidden');
+            $('.tpl-sub-check').prop('checked', false);
+            $('.tpl-other-input').addClass('hidden').val('');
+            document.getElementById('templateModalTitle').innerHTML = '<i class="fa-solid fa-layer-group text-purple-500 mr-2"></i>Tambah Template Baru';
+            $('#templateModal').removeClass('hidden');
+        }
+
+        function closeTemplateModal() {
+            $('#templateModal').addClass('hidden');
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('templateModal') && document.getElementById('templateModal').addEventListener('click', function(e) {
+            if(e.target === this) closeTemplateModal();
+        });
+
+        function handleTemplateSave(e) {
+            e.preventDefault();
+            let selKat = [], selSub = [];
+            $('.tpl-cat-check:checked').each(function() {
+                const kat = $(this).data('kategori');
+                const target = $('#' + $(this).data('target'));
+                let subs = [];
+                const checks = target.find('.tpl-sub-check:checked');
+                if(checks.length) {
+                    checks.each(function() {
+                        if($(this).val() === 'Other') {
+                            const v = target.find('.tpl-other-input').val().trim();
+                            if(v) subs.push(v);
+                        } else subs.push($(this).val());
+                    });
+                } else {
+                    const v = target.find('.tpl-other-input').val().trim();
+                    if(v) subs.push(v);
+                }
+                if(subs.length === 0) return;
+                selKat.push(kat);
+                selSub.push(subs.join(' + '));
+            });
+
+            Swal.fire({ title: 'Menyimpan template...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            const payload = new URLSearchParams({
+                action: "createTemplate",
+                customer: document.getElementById('tplCustomer').value,
+                spec: document.getElementById('tplSpec').value,
+                size: document.getElementById('tplSize').value,
+                department: document.getElementById('tplDept').value,
+                pic: document.getElementById('tplPic').value,
+                kategori: selKat.join(", "),
+                subject: selSub.join(", "),
+                description: document.getElementById('tplDesc').value
+            });
+            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload.toString() })
+                .then(r => r.json())
+                .then(res => {
+                    if(res.status === "success") {
+                        Swal.fire({ title: 'Tersimpan!', text: 'Template ' + res.id + ' berhasil dibuat.', icon: 'success' });
+                        closeTemplateModal();
+                        fetchTemplateData();
+                    } else {
+                        Swal.fire('Gagal!', res.message, 'error');
+                    }
+                })
+                .catch(() => Swal.fire('Error!', 'Gagal menyimpan template.', 'error'));
+        }
+
+        function useTemplate(id) {
+            const t = templateDataStore.find(item => item.id === id);
+            if(!t) return;
+
+            // Switch ke form, lalu isi data dari template
+            switchTab('formTab');
+            clearForm();
+
+            // Isi field yang tersedia
+            if(t.customer && t.customer !== '-') document.getElementById('customerInput').value = t.customer;
+            if(t.spec && t.spec !== '-') document.getElementById('specInput').value = t.spec;
+            if(t.size && t.size !== '-') document.getElementById('sizeInput').value = t.size;
+            if(t.dept && t.dept !== '-') document.getElementById('deptInput').value = t.dept;
+            if(t.pic && t.pic !== '-') document.getElementById('picInput').value = t.pic;
+            if(t.desc && t.desc !== '-') document.getElementById('detailInput').value = t.desc;
+
+            // Restore kategori & subject checkboxes
+            if(t.kategori && t.kategori !== '-' && t.subject && t.subject !== '-') {
+                const katList = t.kategori.split(', ');
+                const subList = t.subject.split(', ');
+                katList.forEach((kat, idx) => {
+                    const subVal = subList[idx] || "";
+                    const checkbox = $(`.category-check[data-kategori="${kat}"]`);
+                    if(!checkbox.length) return;
+                    checkbox.prop('checked', true);
+                    const target = $('#' + checkbox.data('target'));
+                    target.removeClass('hidden');
+                    const subParts = subVal.split(' + ').map(s => s.trim());
+                    subParts.forEach(s => {
+                        const subChk = target.find(`.subject-check[value="${s}"]`);
+                        if(subChk.length) {
+                            subChk.prop('checked', true);
+                        } else if(s) {
+                            target.find('.other-trigger').prop('checked', true);
+                            target.find('.other-input').removeClass('hidden').attr('required', true).val(s);
+                        }
+                    });
+                    if(!target.find('.subject-check').length && subVal) {
+                        target.find('.other-input').val(subVal);
+                    }
+                });
+            }
+
+            document.getElementById('formHeaderTitle').innerText = "Form Special Request (dari Template: " + id + ")";
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Template "' + id + '" dimuat. Lengkapi data yang kosong.', showConfirmButton: false, timer: 3000 });
+        }
+
+        // Toggle tpl category checkboxes
+        $(document).on('change', '.tpl-cat-check', function() {
+            const target = $('#' + $(this).data('target'));
+            if(this.checked) target.removeClass('hidden');
+            else { target.addClass('hidden'); target.find('.tpl-sub-check').prop('checked', false); target.find('.tpl-other-input').addClass('hidden').val(''); }
+        });
+        $(document).on('change', '.tpl-other-trigger', function() {
+            const inp = $(this).closest('div[id^="tpl-cat-"]').find('.tpl-other-input');
+            if(this.checked) inp.removeClass('hidden').focus(); else inp.addClass('hidden').val('');
+        });
+
+        // ========== END TEMPLATE FUNCTIONS ==========
 
         function initCharts() {
             chartYearlyObj = new Chart(document.getElementById('chartYearly').getContext('2d'), {
