@@ -957,10 +957,10 @@
                                 <td class="label">SUBJECT</td><td class="colon">:</td>
                                 <td class="val">${(r.subject && r.subject !== '-') ? r.subject.split(', ').map(s => '<span class="subject-badge">'+esc(s)+'</span>').join(' ') : '-'}</td>
                             </tr>
-                            <tr class="desc-row">
-                                <td class="label">DESCRIPTION</td><td class="colon">:</td>
-                                <td class="val" style="min-height:80px;">${esc(r.desc)}</td>
-                            </tr>
+                                <tr class="desc-row">
+                                    <td class="label">DESCRIPTION</td><td class="colon">:</td>
+                                    <td class="val" style="min-height:80px;"><strong>${esc(r.desc)}</strong></td>
+                                </tr>
                         </table>
                     </div>
 
