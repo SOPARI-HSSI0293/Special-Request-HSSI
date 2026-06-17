@@ -239,7 +239,18 @@
                                             </label>
                                             <div id="cat-newbiz" class="hidden mt-3 pl-6">
                                                 <div class="grid grid-cols-2 gap-2 mb-2">
-                                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="New Size"><span>New Size</span></label>
+                                                    <div class="flex flex-col gap-1">
+                                                        <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                                            <input type="checkbox" id="newSizeCheck" class="subject-check w-4 h-4 text-emerald-600 rounded" value="New Size">
+                                                            <span>New Size</span>
+                                                        </label>
+                                                        <div id="produkMasterBox" class="hidden ml-6">
+                                                            <input type="text" id="produkMasterInput"
+                                                                class="w-full px-3 py-1.5 border-2 border-emerald-400 rounded-lg outline-none focus:border-emerald-600 text-sm font-mono bg-emerald-50"
+                                                                placeholder="Produk Master No *">
+                                                            <p class="text-xs text-emerald-700 mt-0.5 font-medium">⚠ Wajib diisi jika New Size dipilih</p>
+                                                        </div>
+                                                    </div>
                                                     <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="subject-check w-4 h-4 text-emerald-600 rounded" value="New Customer"><span>New Customer</span></label>
                                                     <label class="flex items-center gap-2 text-sm cursor-pointer subject-other-toggle"><input type="checkbox" class="subject-check other-trigger w-4 h-4 text-emerald-600 rounded" value="Other"><span>Other (Isi Manual)</span></label>
                                                 </div>
@@ -520,6 +531,17 @@
                     otherInput.addClass('hidden').removeAttr('required').val('');
                 }
             });
+
+            // Toggle Produk Master No saat New Size dicentang
+            $(document).on('change', '#newSizeCheck', function() {
+                if(this.checked) {
+                    $('#produkMasterBox').removeClass('hidden');
+                    $('#produkMasterInput').attr('required', true).focus();
+                } else {
+                    $('#produkMasterBox').addClass('hidden');
+                    $('#produkMasterInput').removeAttr('required').val('');
+                }
+            });
         });
 
         setInterval(() => { document.getElementById('currentTime').innerText = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }); }, 1000);
@@ -565,7 +587,8 @@
                                 pic: normalized["pic"] || "-",
                                 desc: normalized["description"] || normalized["desc"] || "-",
                                 status: normalized["status"] || "Open",
-                                remarks: normalized["remarks"] || "-"
+                                remarks: normalized["remarks"] || "-",
+                                produk_master: normalized["produk_master_no"] || normalized["produk master no"] || "-"
                             };
                         });
                         renderTables();
@@ -665,7 +688,14 @@
             document.getElementById('specInput').value = record.spec !== "-" ? record.spec : "";
             document.getElementById('sizeInput').value = record.size !== "-" ? record.size : "";
             document.getElementById('ccInput').value = record.cc_no !== "-" ? record.cc_no : "";
-            document.getElementById('poInput').value = record.po; 
+            document.getElementById('poInput').value = record.po;
+            if(record.produk_master && record.produk_master !== '-') {
+                $('#produkMasterInput').val(record.produk_master).attr('required', true);
+                $('#produkMasterBox').removeClass('hidden');
+            } else {
+                $('#produkMasterBox').addClass('hidden');
+                $('#produkMasterInput').removeAttr('required').val('');
+            }
             document.getElementById('detailInput').value = record.desc;
 
             // Reset semua kategori sebelum mengisi ulang
@@ -835,6 +865,7 @@
                 size: document.getElementById('sizeInput').value,
                 cc_no: document.getElementById('ccInput').value,
                 process_order_no: document.getElementById('poInput').value, 
+                produk_master_no: document.getElementById('produkMasterInput').value.trim(),
                 kategori: selectedKategori.join(", "),
                 subject: selectedSubjects.join(", "),
                 description: document.getElementById('detailInput').value
@@ -867,6 +898,8 @@
             $('#categoryGroup > div > div[id^="cat-"]').addClass('hidden');
             $('.subject-check').prop('checked', false);
             $('.other-input').addClass('hidden').removeAttr('required').val('');
+            $('#produkMasterBox').addClass('hidden');
+            $('#produkMasterInput').removeAttr('required').val('');
             document.getElementById('formHeaderTitle').innerText = "Form Special Request Baru";
             document.getElementById('submitBtnForm').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Simpan ke Database`;
         }
@@ -876,6 +909,16 @@
             if (!r) { Swal.fire('Error', 'Data tidak ditemukan.', 'error'); return; }
 
             const esc = (v) => (v || '-').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+
+            // Hitung berapa banyak data di database dengan PRODUK_MASTER_NO yang sama
+            let masterCount = 0;
+            const rMaster = (r.produk_master || '').toString().trim();
+            if (rMaster && rMaster !== '-') {
+                masterCount = localDataStore.filter(item => {
+                    const m = (item.produk_master || '').toString().trim();
+                    return m && m !== '-' && m === rMaster;
+                }).length;
+            }
 
             const printHtml = `
                 <!DOCTYPE html><html><head><title>Special Request - ${esc(r.id)}</title>
@@ -907,6 +950,9 @@
 
                     .kategori-badge { display:inline-block; background:#e0f2fe; border:1px solid #7dd3fc; border-radius:4px; padding:1px 6px; font-size:9pt; margin-bottom:2px; }
                     .subject-badge { display:inline-block; background:#f0fdf4; border:1px solid #86efac; border-radius:4px; padding:1px 6px; font-size:9pt; }
+                    .desc-badge { display:inline; background:#fff1f2; border:1px solid #fca5a5; border-radius:4px; padding:2px 8px; font-size:9.5pt; font-weight:bold; color:#991b1b; }
+                    .master-badge { display:inline-block; background:#eff6ff; border:1px solid #93c5fd; border-radius:4px; padding:1px 8px; font-size:9.5pt; font-weight:bold; color:#1e40af; }
+                    .master-count { display:inline-block; margin-left:8px; background:#fef3c7; border:1px solid #fbbf24; border-radius:4px; padding:1px 8px; font-size:9pt; font-weight:bold; color:#92400e; }
 
                     .desc-area { border-top: 1px dashed #888; margin-top:6px; padding-top:6px; min-height:120px; }
 
@@ -966,8 +1012,16 @@
                             </tr>
                                 <tr class="desc-row">
                                     <td class="label">DESCRIPTION</td><td class="colon">:</td>
-                                    <td class="val" style="min-height:80px;"><strong>${esc(r.desc)}</strong></td>
+                                    <td class="val" style="min-height:60px;"><span class="desc-badge">${esc(r.desc)}</span></td>
                                 </tr>
+                                ${(r.produk_master && r.produk_master !== '-') ? `
+                                <tr>
+                                    <td class="label">PRODUK MASTER NO</td><td class="colon">:</td>
+                                    <td class="val">
+                                        <span class="master-badge">${esc(r.produk_master)}</span>
+                                        ${masterCount > 1 ? `<span class="master-count">sudah ada ${masterCount} data yang sama</span>` : ''}
+                                    </td>
+                                </tr>` : ''}
                         </table>
                     </div>
 
