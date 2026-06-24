@@ -904,154 +904,206 @@
             document.getElementById('submitBtnForm').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Simpan ke Database`;
         }
 
-        function triggerPrintEngine(id) {
-            const r = localDataStore.find(item => item.id === id);
-            if (!r) { Swal.fire('Error', 'Data tidak ditemukan.', 'error'); return; }
+function triggerPrintEngine(id) {
+    const r = localDataStore.find(item => item.id === id);
+    if (!r) { Swal.fire('Error', 'Data tidak ditemukan.', 'error'); return; }
 
-            const esc = (v) => (v || '-').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    const esc = (v) => (v || '-').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 
-            // Hitung berapa banyak data di database dengan PRODUK_MASTER_NO yang sama
-            let masterCount = 0;
-            const rMaster = (r.produk_master || '').toString().trim();
-            if (rMaster && rMaster !== '-') {
-                masterCount = localDataStore.filter(item => {
-                    const m = (item.produk_master || '').toString().trim();
-                    return m && m !== '-' && m === rMaster;
-                }).length;
+    // Hitung berapa banyak data di database dengan PRODUK_MASTER_NO yang sama
+    let masterCount = 0;
+    const rMaster = (r.produk_master || '').toString().trim();
+    if (rMaster && rMaster !== '-') {
+        masterCount = localDataStore.filter(item => {
+            const m = (item.produk_master || '').toString().trim();
+            return m && m !== '-' && m === rMaster;
+        }).length;
+    }
+
+    // =========================================================================
+    // LOGIKA GARIS WARNA (KETEBALAN 2 CM)
+    // =========================================================================
+    let colorLinesHtml = '';
+    if (r.kategori && r.kategori !== '-') {
+        let categories = r.kategori.split(', ');
+        categories.forEach(cat => {
+            let color = '';
+            if (cat.includes('QUALITY & SPECS')) color = '#ef4444';       // Merah
+            else if (cat.includes('TIME & DELIVERY')) color = '#064e3b';  // Hijau Tua
+            else if (cat.includes('TRIAL & R&D')) color = '#3b82f6';      // Biru
+            else if (cat.includes('NEW BUSINESS')) color = '#eab308';     // Kuning
+            else if (cat.includes('OTHER')) color = '#a855f7';            // Ungu
+            
+            if (color !== '') {
+                colorLinesHtml += `<div style="width: 100%; height: 2cm; background-color: ${color}; border-top: 2cm solid ${color}; margin-top: 2px;"></div>`;
+            }
+        });
+    }
+
+    const printHtml = `
+        <!DOCTYPE html><html><head><title>Special Request - ${esc(r.id)}</title>
+        <meta charset="utf-8">
+        <style>
+            @page { size: A4; margin: 15mm 15mm; }
+            * { box-sizing: border-box; }
+            
+            body { 
+                font-family: Arial, Helvetica, sans-serif; 
+                font-size: 10pt; 
+                color:#000; 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
             }
 
-            const printHtml = `
-                <!DOCTYPE html><html><head><title>Special Request - ${esc(r.id)}</title>
-                <meta charset="utf-8">
-                <style>
-                    @page { size: A4; margin: 15mm 15mm; }
-                    * { box-sizing: border-box; }
-                    body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color:#000; }
+            .title-row { display:flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; }
+            .title { font-weight: bold; font-size: 12pt; }
+            .doc-code { text-align: right; font-size: 10pt; line-height: 1.5; }
 
-                    .title-row { display:flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; }
-                    .title { font-weight: bold; font-size: 12pt; }
-                    .doc-code { text-align: right; font-size: 10pt; line-height: 1.5; }
+            .head-table { width:100%; border-collapse:collapse; margin-bottom: 6px; }
+            .head-table td { padding: 1px 4px; vertical-align: top; }
+            .head-table .label { width: 95px; white-space: nowrap; }
+            .head-table .colon { width: 12px; }
 
-                    .head-table { width:100%; border-collapse:collapse; margin-bottom: 6px; }
-                    .head-table td { padding: 1px 4px; vertical-align: top; }
-                    .head-table .label { width: 95px; white-space: nowrap; }
-                    .head-table .colon { width: 12px; }
+            .req-title { font-weight: bold; margin: 4px 0 2px 0; font-size: 10pt; }
 
-                    .req-title { font-weight: bold; margin: 4px 0 2px 0; font-size: 10pt; }
+            .req-box { border: 1px solid #000; padding: 6px 8px; margin-bottom: 6px; }
+            .req-table { width:100%; border-collapse:collapse; }
+            .req-table td { padding: 2px 4px; vertical-align: top; }
+            .req-table .label { width: 120px; white-space: nowrap; font-weight: bold; }
+            .req-table .colon { width: 12px; }
+            .req-table .val { word-break: break-word; }
+            .req-table tr.spacer td { height: 6px; }
+            .req-table tr.desc-row td { padding-top: 6px; }
 
-                    .req-box { border: 1px solid #000; padding: 6px 8px; margin-bottom: 6px; }
-                    .req-table { width:100%; border-collapse:collapse; }
-                    .req-table td { padding: 2px 4px; vertical-align: top; }
-                    .req-table .label { width: 120px; white-space: nowrap; font-weight: bold; }
-                    .req-table .colon { width: 12px; }
-                    .req-table .val { word-break: break-word; }
-                    .req-table tr.spacer td { height: 6px; }
-                    .req-table tr.desc-row td { padding-top: 6px; }
+            /* Base style untuk kategori badge (warna background & teks diatur dinamis lewat inline style) */
+            .kategori-badge { display:inline-block; border:1px solid #000; border-radius:4px; padding:2px 8px; font-size:9pt; margin-bottom:2px; font-weight: bold; text-shadow: 0px 0px 1px rgba(0,0,0,0.1); }
+            
+            .subject-badge { display:inline-block; background:#f0fdf4; border:1px solid #86efac; border-radius:4px; padding:1px 6px; font-size:9pt; }
+            .desc-badge { display:inline; background:#fff1f2; border:1px solid #fca5a5; border-radius:4px; padding:2px 8px; font-size:9.5pt; font-weight:bold; color:#991b1b; }
+            .master-badge { display:inline-block; background:#eff6ff; border:1px solid #93c5fd; border-radius:4px; padding:1px 8px; font-size:9.5pt; font-weight:bold; color:#1e40af; }
+            .master-count { display:inline-block; margin-left:8px; background:#fef3c7; border:1px solid #fbbf24; border-radius:4px; padding:1px 8px; font-size:9pt; font-weight:bold; color:#92400e; }
 
-                    .kategori-badge { display:inline-block; background:#e0f2fe; border:1px solid #7dd3fc; border-radius:4px; padding:1px 6px; font-size:9pt; margin-bottom:2px; }
-                    .subject-badge { display:inline-block; background:#f0fdf4; border:1px solid #86efac; border-radius:4px; padding:1px 6px; font-size:9pt; }
-                    .desc-badge { display:inline; background:#fff1f2; border:1px solid #fca5a5; border-radius:4px; padding:2px 8px; font-size:9.5pt; font-weight:bold; color:#991b1b; }
-                    .master-badge { display:inline-block; background:#eff6ff; border:1px solid #93c5fd; border-radius:4px; padding:1px 8px; font-size:9.5pt; font-weight:bold; color:#1e40af; }
-                    .master-count { display:inline-block; margin-left:8px; background:#fef3c7; border:1px solid #fbbf24; border-radius:4px; padding:1px 8px; font-size:9pt; font-weight:bold; color:#92400e; }
+            .desc-area { border-top: 1px dashed #888; margin-top:6px; padding-top:6px; min-height:120px; }
 
-                    .desc-area { border-top: 1px dashed #888; margin-top:6px; padding-top:6px; min-height:120px; }
+            .comment-title { font-weight: bold; margin: 4px 0 2px 0; }
+            .comment-box { border: 1px solid #000; min-height: 160px; padding: 6px 8px; margin-bottom: 6px; font-size:10pt; }
 
-                    .comment-title { font-weight: bold; margin: 4px 0 2px 0; }
-                    .comment-box { border: 1px solid #000; min-height: 160px; padding: 6px 8px; margin-bottom: 6px; font-size:10pt; }
+            .footer-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
+            .footer-note { font-size: 8.5pt; max-width: 240px; line-height:1.4; }
+            .footer-note p { margin: 2px 0; }
 
-                    .footer-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
-                    .footer-note { font-size: 8.5pt; max-width: 240px; line-height:1.4; }
-                    .footer-note p { margin: 2px 0; }
+            .sign-section { display:flex; align-items: stretch; flex-shrink:0; }
+            .sign-table { border-collapse: collapse; }
+            .sign-table td { border: 1px solid #000; width: 58px; text-align:center; vertical-align: middle; padding: 3px; font-size: 8.5pt; }
+            .sign-table td.head { font-weight: bold; padding: 4px 3px; }
+            .sign-table .body-cell { height: 50px; }
+            .arrow { display:flex; align-items:center; justify-content:center; padding: 0 5px; font-size: 16pt; color: #2563eb; font-weight: bold; }
+            
+            .color-footer { margin-top: 20px; }
+        </style>
+        </head><body onload="window.print()">
+            <div class="title-row">
+                <div class="title">SPECIAL REQUEST</div>
+                <div class="doc-code">HSSI/SR-1502-01<br>15 Januari 2025/Rev.2</div>
+            </div>
 
-                    .sign-section { display:flex; align-items: stretch; flex-shrink:0; }
-                    .sign-table { border-collapse: collapse; }
-                    .sign-table td { border: 1px solid #000; width: 58px; text-align:center; vertical-align: middle; padding: 3px; font-size: 8.5pt; }
-                    .sign-table td.head { font-weight: bold; padding: 4px 3px; }
-                    .sign-table .body-cell { height: 50px; }
-                    .arrow { display:flex; align-items:center; justify-content:center; padding: 0 5px; font-size: 16pt; color: #2563eb; font-weight: bold; }
-                </style>
-                </head><body onload="window.print()">
-                    <div class="title-row">
-                        <div class="title">SPECIAL REQUEST</div>
-                        <div class="doc-code">HSSI/SR-1502-01<br>15 Januari 2025/Rev.2</div>
-                    </div>
+            <table class="head-table">
+                <tr><td class="label">ID Dokumen</td><td class="colon">:</td><td>${esc(r.id)}</td></tr>
+                <tr><td class="label">DATE</td><td class="colon">:</td><td>${esc(r.date)}</td></tr>
+                <tr><td class="label">PIC</td><td class="colon">:</td><td>${esc(r.pic)}</td></tr>
+                <tr><td class="label">DEPARTMENT</td><td class="colon">:</td><td>${esc(r.dept)}</td></tr>
+            </table>
 
-                    <table class="head-table">
-                        <tr><td class="label">ID Dokumen</td><td class="colon">:</td><td>${esc(r.id)}</td></tr>
-                        <tr><td class="label">DATE</td><td class="colon">:</td><td>${esc(r.date)}</td></tr>
-                        <tr><td class="label">PIC</td><td class="colon">:</td><td>${esc(r.pic)}</td></tr>
-                        <tr><td class="label">DEPARTMENT</td><td class="colon">:</td><td>${esc(r.dept)}</td></tr>
+            <div class="req-title">Jelaskan Permohonannya ( Alasan atau tujuan dan lebih detail untuk Material / Parameter setting )</div>
+            <div class="req-box">
+                <table class="req-table">
+                    <tr>
+                        <td class="label">CUSTOMER</td><td class="colon">:</td><td class="val">${esc(r.customer)}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">SPEC</td><td class="colon">:</td><td class="val">${esc(r.spec)}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">SIZE</td><td class="colon">:</td><td class="val">${esc(r.size)}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">CC NO</td><td class="colon">:</td><td class="val">${esc(r.cc_no)}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">PROCESS ORDER NO</td><td class="colon">:</td><td class="val">${esc(r.po)}</td>
+                    </tr>
+                    <tr class="spacer"><td colspan="3"></td></tr>
+                    <tr>
+                        <td class="label">KATEGORI</td><td class="colon">:</td>
+                        <td class="val">
+                            ${(r.kategori && r.kategori !== '-') ? r.kategori.split(', ').map(k => {
+                                // Default Style jika tidak cocok
+                                let bg = '#e0f2fe'; 
+                                let text = '#000000'; 
+                                let border = '#7dd3fc';
+                                
+                                // Penentuan warna teks & background badge berdasarkan kategori
+                                if (k.includes('QUALITY & SPECS')) { bg = '#ef4444'; text = '#ffffff'; border = '#dc2626'; }
+                                else if (k.includes('TIME & DELIVERY')) { bg = '#064e3b'; text = '#ffffff'; border = '#022c22'; }
+                                else if (k.includes('TRIAL & R&D')) { bg = '#3b82f6'; text = '#ffffff'; border = '#2563eb'; }
+                                else if (k.includes('NEW BUSINESS')) { bg = '#eab308'; text = '#000000'; border = '#ca8a04'; }
+                                else if (k.includes('OTHER')) { bg = '#a855f7'; text = '#ffffff'; border = '#9333ea'; }
+                                
+                                return `<span class="kategori-badge" style="background-color: ${bg}; color: ${text}; border-color: ${border};">${esc(k)}</span>`;
+                            }).join(' ') : '-'}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">SUBJECT</td><td class="colon">:</td>
+                        <td class="val">${(r.subject && r.subject !== '-') ? r.subject.split(', ').map(s => '<span class="subject-badge">'+esc(s)+'</span>').join(' ') : '-'}</td>
+                    </tr>
+                        <tr class="desc-row">
+                            <td class="label">DESCRIPTION</td><td class="colon">:</td>
+                            <td class="val" style="min-height:60px;"><span class="desc-badge">${esc(r.desc)}</span></td>
+                        </tr>
+                        ${(r.produk_master && r.produk_master !== '-') ? `
+                        <tr>
+                            <td class="label">PRODUK MASTER NO</td><td class="colon">:</td>
+                            <td class="val">
+                                <span class="master-badge">${esc(r.produk_master)}</span>
+                                ${masterCount > 1 ? `<span class="master-count">sudah ada ${masterCount} data yang sama</span>` : ''}
+                            </td>
+                        </tr>` : ''}
+                </table>
+            </div>
+
+            <div class="comment-title">* Komentar / Settingan khusus jika ada</div>
+            <div class="comment-box">${esc(r.remarks)}</div>
+
+            <div class="footer-row">
+                <div class="footer-note">
+                    <p>* Terutama TRIAL, Form ini di pegang oleh bagian / Depart yang memohon sampai hasilnya keluar lalu buat laporan dan submit ke PPC</p>
+                    <p>* Utamakan penjelasan dalam format Bahasa Indonesia</p>
+                </div>
+                <div class="sign-section">
+                    <table class="sign-table">
+                        <tr><td class="head">Request</td><td class="head">Check</td><td class="head">Approve</td></tr>
+                        <tr><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td></tr>
                     </table>
+                    <div class="arrow">&#8596;</div>
+                    <table class="sign-table">
+                        <tr><td class="head">PPC</td><td class="head">QC</td><td class="head">Approve</td></tr>
+                        <tr><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td></tr>
+                    </table>
+                </div>
+            </div>
 
-                    <div class="req-title">Jelaskan Permohonannya ( Alasan atau tujuan dan lebih detail untuk Material / Parameter setting )</div>
-                    <div class="req-box">
-                        <table class="req-table">
-                            <tr>
-                                <td class="label">CUSTOMER</td><td class="colon">:</td><td class="val">${esc(r.customer)}</td>
-                            </tr>
-                            <tr>
-                                <td class="label">SPEC</td><td class="colon">:</td><td class="val">${esc(r.spec)}</td>
-                            </tr>
-                            <tr>
-                                <td class="label">SIZE</td><td class="colon">:</td><td class="val">${esc(r.size)}</td>
-                            </tr>
-                            <tr>
-                                <td class="label">CC NO</td><td class="colon">:</td><td class="val">${esc(r.cc_no)}</td>
-                            </tr>
-                            <tr>
-                                <td class="label">PROCESS ORDER NO</td><td class="colon">:</td><td class="val">${esc(r.po)}</td>
-                            </tr>
-                            <tr class="spacer"><td colspan="3"></td></tr>
-                            <tr>
-                                <td class="label">KATEGORI</td><td class="colon">:</td>
-                                <td class="val">${(r.kategori && r.kategori !== '-') ? r.kategori.split(', ').map(k => '<span class="kategori-badge">'+esc(k)+'</span>').join(' ') : '-'}</td>
-                            </tr>
-                            <tr>
-                                <td class="label">SUBJECT</td><td class="colon">:</td>
-                                <td class="val">${(r.subject && r.subject !== '-') ? r.subject.split(', ').map(s => '<span class="subject-badge">'+esc(s)+'</span>').join(' ') : '-'}</td>
-                            </tr>
-                                <tr class="desc-row">
-                                    <td class="label">DESCRIPTION</td><td class="colon">:</td>
-                                    <td class="val" style="min-height:60px;"><span class="desc-badge">${esc(r.desc)}</span></td>
-                                </tr>
-                                ${(r.produk_master && r.produk_master !== '-') ? `
-                                <tr>
-                                    <td class="label">PRODUK MASTER NO</td><td class="colon">:</td>
-                                    <td class="val">
-                                        <span class="master-badge">${esc(r.produk_master)}</span>
-                                        ${masterCount > 1 ? `<span class="master-count">sudah ada ${masterCount} data yang sama</span>` : ''}
-                                    </td>
-                                </tr>` : ''}
-                        </table>
-                    </div>
+            <div class="color-footer">
+                ${colorLinesHtml}
+            </div>
 
-                    <div class="comment-title">* Komentar / Settingan khusus jika ada</div>
-                    <div class="comment-box">${esc(r.remarks)}</div>
+        </body></html>`;
 
-                    <div class="footer-row">
-                        <div class="footer-note">
-                            <p>* Terutama TRIAL, Form ini di pegang oleh bagian / Depart yang memohon sampai hasilnya keluar lalu buat laporan dan submit ke PPC</p>
-                            <p>* Utamakan penjelasan dalam format Bahasa Indonesia</p>
-                        </div>
-                        <div class="sign-section">
-                            <table class="sign-table">
-                                <tr><td class="head">Request</td><td class="head">Check</td><td class="head">Approve</td></tr>
-                                <tr><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td></tr>
-                            </table>
-                            <div class="arrow">&#8596;</div>
-                            <table class="sign-table">
-                                <tr><td class="head">PPC</td><td class="head">QC</td><td class="head">Approve</td></tr>
-                                <tr><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td><td class="body-cell">&nbsp;</td></tr>
-                            </table>
-                        </div>
-                    </div>
-                </body></html>`;
-
-            const win = window.open('', '_blank');
-            win.document.open();
-            win.document.write(printHtml);
-            win.document.close();
-        }
+    const win = window.open('', '_blank');
+    win.document.open();
+    win.document.write(printHtml);
+    win.document.close();
+}
 
         // ========== TEMPLATE FUNCTIONS ==========
 
@@ -1276,6 +1328,9 @@
             chartSubjectObj.data.datasets[0].data = sortedSubj.map(i => i[1]);
             chartSubjectObj.update();
         }
+
+
+
     </script>
 </body>
 </html>
