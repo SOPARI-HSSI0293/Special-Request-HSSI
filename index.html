@@ -160,9 +160,17 @@
                         <div class="mb-8">
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-box text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Identitas Pesanan / Produk</h4></div>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4 items-start">
                                 <div><label class="form-label">Customer Name</label><input type="text" id="customerInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="PT. / CV. Penerima"></div>
-                                <div><label class="form-label">Process Order No <span class="text-red-500">*</span></label><input type="text" required id="poInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono uppercase" placeholder="Masukkan Nomor Proses/PO"></div>
+                                <div class="md:col-span-2 lg:col-span-3">
+                                    <label class="form-label">Process Order No <span class="text-red-500">*</span></label>
+                                    <div id="poEntries" class="space-y-2">
+                                        <!-- PO entry rows added by JS -->
+                                    </div>
+                                    <button type="button" onclick="addPoEntry()" class="mt-2 flex items-center gap-1.5 text-sm text-emerald-600 hover:text-emerald-800 font-semibold transition-colors">
+                                        <i class="fa-solid fa-circle-plus"></i> Tambah Process Order No
+                                    </button>
+                                </div>
                                 <div><label class="form-label">CC No</label><input type="text" id="ccInput" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500" placeholder="Nomor CC"></div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -592,6 +600,7 @@
                             };
                         });
                         renderTables();
+                    addPoEntry('');
                         calculateMetrics();
                     } else {
                         Swal.fire('Error Backend', res.message, 'error');
@@ -688,7 +697,7 @@
             document.getElementById('specInput').value = record.spec !== "-" ? record.spec : "";
             document.getElementById('sizeInput').value = record.size !== "-" ? record.size : "";
             document.getElementById('ccInput').value = record.cc_no !== "-" ? record.cc_no : "";
-            document.getElementById('poInput').value = record.po;
+            setPoValue(record.po);
             if(record.produk_master && record.produk_master !== '-') {
                 $('#produkMasterInput').val(record.produk_master).attr('required', true);
                 $('#produkMasterBox').removeClass('hidden');
@@ -846,6 +855,10 @@
                 selectedSubjects.push(subjects.join(' + '));
             });
 
+            if(!validatePoEntries()) {
+                Swal.fire({ toast:true, position:'top-end', icon:'warning', title:'Process Order No wajib diisi!', showConfirmButton:false, timer:2500 });
+                return;
+            }
             if(selectedKategori.length === 0) {
                 Swal.fire({ title: 'Gagal Simpan!', text: 'Pilih minimal satu Kategori dan isi Subject-nya.', icon: 'error' });
                 return;
@@ -864,7 +877,7 @@
                 spec: document.getElementById('specInput').value,
                 size: document.getElementById('sizeInput').value,
                 cc_no: document.getElementById('ccInput').value,
-                process_order_no: document.getElementById('poInput').value, 
+                process_order_no: getPoValue(),
                 produk_master_no: document.getElementById('produkMasterInput').value.trim(),
                 kategori: selectedKategori.join(", "),
                 subject: selectedSubjects.join(", "),
@@ -890,6 +903,83 @@
             .catch(err => Swal.fire({ title: 'Error!', text: 'Gagal memproses data server.', icon: 'error' }));
         }
 
+        // ===== PROCESS ORDER NO - SEGMENTED MULTI ENTRY =====
+        function createPoEntry(val) {
+            const parts = (val || '').split('-');
+            const p = [parts[0]||'', parts[1]||'', parts[2]||'', parts[3]||''];
+            const div = document.createElement('div');
+            div.className = 'po-entry flex items-center gap-1.5 flex-wrap';
+            div.innerHTML = `
+                <input type="text" maxlength="2" class="po-seg w-12 px-2 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono text-center uppercase text-sm" placeholder="XX" value="${p[0]}">
+                <span class="text-slate-400 font-bold text-lg">-</span>
+                <input type="text" maxlength="5" class="po-seg w-20 px-2 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono text-center uppercase text-sm" placeholder="XXXXX" value="${p[1]}">
+                <span class="text-slate-400 font-bold text-lg">-</span>
+                <input type="text" maxlength="2" class="po-seg w-14 px-2 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono text-center uppercase text-sm" placeholder="XX" value="${p[2]}">
+                <span class="text-slate-400 font-bold text-lg">-</span>
+                <input type="text" maxlength="2" class="po-seg w-14 px-2 py-2 border border-slate-300 rounded-lg outline-none focus:border-emerald-500 font-mono text-center uppercase text-sm" placeholder="XX" value="${p[3]}">
+                <button type="button" onclick="removePoEntry(this)" class="remove-po-btn ml-1 text-slate-300 hover:text-red-500 transition-colors" title="Hapus baris ini"><i class="fa-solid fa-circle-minus text-lg"></i></button>
+            `;
+            div.querySelectorAll('.po-seg').forEach((inp, idx, arr) => {
+                inp.addEventListener('input', () => {
+                    inp.value = inp.value.toUpperCase();
+                    if(inp.value.length >= parseInt(inp.maxLength) && idx < arr.length - 1) arr[idx+1].focus();
+                });
+                inp.addEventListener('keydown', (e) => {
+                    if(e.key === 'Backspace' && inp.value === '' && idx > 0) arr[idx-1].focus();
+                });
+            });
+            return div;
+        }
+
+        function addPoEntry(val) {
+            const container = document.getElementById('poEntries');
+            const entry = createPoEntry(val || '');
+            container.appendChild(entry);
+            updateRemoveBtnVisibility();
+            if(!val) entry.querySelector('.po-seg').focus();
+        }
+
+        function removePoEntry(btn) {
+            btn.closest('.po-entry').remove();
+            updateRemoveBtnVisibility();
+        }
+
+        function updateRemoveBtnVisibility() {
+            const entries = document.querySelectorAll('.po-entry');
+            entries.forEach(e => {
+                e.querySelector('.remove-po-btn').style.visibility = entries.length > 1 ? 'visible' : 'hidden';
+            });
+        }
+
+        function getPoValue() {
+            const results = [];
+            document.querySelectorAll('.po-entry').forEach(entry => {
+                const segs = entry.querySelectorAll('.po-seg');
+                const joined = Array.from(segs).map(s => s.value.trim()).join('-');
+                if(segs[0].value.trim()) results.push(joined);
+            });
+            return results.join('/');
+        }
+
+        function setPoValue(val) {
+            const container = document.getElementById('poEntries');
+            container.innerHTML = '';
+            if(!val || val === '-') { addPoEntry(''); return; }
+            val.split('/').forEach(v => addPoEntry(v.trim()));
+        }
+
+        function validatePoEntries() {
+            const first = document.querySelector('.po-entry .po-seg');
+            if(first && !first.value.trim()) {
+                first.classList.add('border-red-500');
+                first.focus();
+                return false;
+            }
+            if(first) first.classList.remove('border-red-500');
+            return true;
+        }
+        // ===== END PROCESS ORDER NO =====
+
         function clearForm() {
             document.getElementById('specialRequestForm').reset();
             document.getElementById('dateInput').valueAsDate = new Date();
@@ -900,6 +990,7 @@
             $('.other-input').addClass('hidden').removeAttr('required').val('');
             $('#produkMasterBox').addClass('hidden');
             $('#produkMasterInput').removeAttr('required').val('');
+            setPoValue('');
             document.getElementById('formHeaderTitle').innerText = "Form Special Request Baru";
             document.getElementById('submitBtnForm').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Simpan ke Database`;
         }
