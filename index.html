@@ -146,7 +146,7 @@
             <div id="formTab" class="view-section hidden max-w-5xl mx-auto block">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="bg-white border-b border-slate-100 px-8 py-5"><h3 class="text-xl font-bold text-slate-800" id="formHeaderTitle">Form Special Request Baru</h3><p class="text-sm text-slate-500 mt-1">Data akan di kirim dan di simpan di database .</p></div>
-                    <form id="specialRequestForm" class="p-8" onsubmit="handleFormSubmit(event)">
+                    <form id="specialRequestForm" class="p-8" onsubmit="handleFormSubmit(event)" novalidate>
                         
                         <div class="mb-8">
                             <div class="flex items-center border-b-2 border-emerald-200 pb-2 mb-5"><i class="fa-solid fa-circle-user text-emerald-500 mr-2"></i><h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Informasi Pemohon</h4></div>
@@ -543,7 +543,7 @@
             $(document).on('change', '.other-trigger', function() {
                 const otherInput = $(this).closest('div[id^="cat-"]').find('.other-input');
                 if(this.checked) {
-                    otherInput.removeClass('hidden').attr('required', true).focus();
+                    otherInput.removeClass('hidden').focus();
                 } else {
                     otherInput.addClass('hidden').removeAttr('required').val('');
                 }
@@ -553,7 +553,7 @@
             $(document).on('change', '#newSizeCheck', function() {
                 if(this.checked) {
                     $('#produkMasterBox').removeClass('hidden');
-                    $('#produkMasterInput').attr('required', true).focus();
+                    $('#produkMasterInput').focus();
                 } else {
                     $('#produkMasterBox').addClass('hidden');
                     $('#produkMasterInput').removeAttr('required').val('');
@@ -752,7 +752,7 @@
                             subChk.prop('checked', true);
                         } else if(s) {
                             target.find('.other-trigger').prop('checked', true);
-                            target.find('.other-input').removeClass('hidden').attr('required', true).val(s);
+                            target.find('.other-input').removeClass('hidden').val(s);
                         }
                     });
                     if(!target.find('.subject-check').length && subVal) {
@@ -844,6 +844,18 @@
         // PERUBAHAN PENGIRIMAN DATA FORM UNTUK MEMASUKKAN SPEC, SIZE, CC NO & KATEGORI
         function handleFormSubmit(e) {
             e.preventDefault();
+
+            // Validasi manual field wajib yang terlihat
+            const dateVal = document.getElementById('dateInput').value;
+            const picVal = document.getElementById('picInput').value.trim();
+            const descVal = document.getElementById('detailInput').value.trim();
+            if(!dateVal || !picVal || !descVal) {
+                Swal.fire({ icon: 'warning', title: 'Form Belum Lengkap', text: 'Tanggal, PIC, dan Deskripsi Request wajib diisi.', confirmButtonColor: '#10b981' });
+                if(!picVal) document.getElementById('picInput').focus();
+                if(!descVal) document.getElementById('detailInput').focus();
+                return;
+            }
+
             let selectedKategori = [];
             let selectedSubjects = [];
 
@@ -1377,7 +1389,7 @@
                             subChk.prop('checked', true);
                         } else if(s) {
                             target.find('.other-trigger').prop('checked', true);
-                            target.find('.other-input').removeClass('hidden').attr('required', true).val(s);
+                            target.find('.other-input').removeClass('hidden').val(s);
                         }
                     });
                     if(!target.find('.subject-check').length && subVal) {
